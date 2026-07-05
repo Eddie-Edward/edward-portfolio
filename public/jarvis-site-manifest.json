@@ -1,0 +1,114 @@
+{
+  "site": "Edward Lei",
+  "tagline": "AI systems builder · engineering student",
+  "contractVersion": "1.0.0",
+  "contentVersion": "1.0.0",
+  "updateGuide": "docs/jarvis-update-guide.md",
+  "contentModel": "docs/content-model.md",
+  "contract": "docs/jarvis-portfolio-contract.md",
+  "contentDir": "src/content",
+  "schemaFile": "src/content/schema.ts",
+  "validateCommand": "pnpm content:check",
+  "contentFiles": [
+    {
+      "path": "src/content/profile.ts",
+      "holds": "identity, mission, bio, education"
+    },
+    {
+      "path": "src/content/projects.ts",
+      "holds": "all projects, constellation layout, case studies"
+    },
+    {
+      "path": "src/content/timeline.ts",
+      "holds": "chronological education/work/project milestones"
+    },
+    {
+      "path": "src/content/skills.ts",
+      "holds": "skill groups for the systems map"
+    },
+    {
+      "path": "src/content/achievements.ts",
+      "holds": "verified, source-cited achievements"
+    },
+    {
+      "path": "src/content/coursework.ts",
+      "holds": "selected coursework"
+    },
+    {
+      "path": "src/content/roadmap.ts",
+      "holds": "now/next/later directions"
+    },
+    {
+      "path": "src/content/links.ts",
+      "holds": "public profile links"
+    },
+    {
+      "path": "src/content/site-config.ts",
+      "holds": "site meta, nav, versions"
+    }
+  ],
+  "api": [
+    {
+      "path": "/api/health",
+      "returns": "liveness + versions"
+    },
+    {
+      "path": "/api/site-manifest",
+      "returns": "this manifest"
+    },
+    {
+      "path": "/api/projects",
+      "returns": "all projects"
+    },
+    {
+      "path": "/api/timeline",
+      "returns": "all timeline entries"
+    },
+    {
+      "path": "/api/skills",
+      "returns": "all skill groups"
+    },
+    {
+      "path": "/api/jarvis/portfolio-context",
+      "returns": "full public content bundle for agent consumption"
+    }
+  ],
+  "pages": [
+    {
+      "path": "/",
+      "holds": "hero, constellation, work, timeline, skills, roadmap, contact"
+    },
+    {
+      "path": "/projects/jarvis-os",
+      "holds": "case study: JARVIS OS"
+    },
+    {
+      "path": "/projects/rlarena",
+      "holds": "case study: RLArena"
+    },
+    {
+      "path": "/projects/prsense",
+      "holds": "case study: PRSense"
+    },
+    {
+      "path": "/projects/interviewcopilot",
+      "holds": "case study: InterviewCopilot"
+    }
+  ],
+  "counts": {
+    "projects": 11,
+    "caseStudies": 4,
+    "timelineEntries": 8,
+    "skillGroups": 6,
+    "achievements": 6,
+    "roadmapItems": 5
+  },
+  "rules": [
+    "Read-only API — content changes happen via pull requests editing src/content/*.ts.",
+    "Every content edit must pass `pnpm content:check` (schemas + integrity + safety scan).",
+    "Never add unverified claims: use source:'todo' entries with an explicit todo note.",
+    "Never add phone numbers, street addresses, or secrets to content files.",
+    "Do not scrape rendered HTML — consume /api/jarvis/portfolio-context instead."
+  ],
+  "generatedAt": "2026-07-05T00:42:17.574Z"
+}

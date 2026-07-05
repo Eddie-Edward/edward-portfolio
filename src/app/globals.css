@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+ * Design tokens — see docs/design-system.md
+ * ------------------------------------------------------------------------- */
+@theme inline {
+  /* Surfaces */
+  --color-void: #05060f;
+  --color-abyss: #0b0e1e;
+  --color-surface: #11142a;
+
+  /* Text */
+  --color-ink: #e8ebf8;
+  --color-mist: #9aa3c4;
+  --color-dim: #7c85a8;
+
+  /* Structure */
+  --color-line: #232945;
+
+  /* Accents */
+  --color-accent: #22d3ee;
+  --color-accent-bright: #7deffc;
+  --color-nebula: #8b5cf6;
+  --color-nebula-bright: #b79dfa;
+  --color-signal: #fbbf24;
+
+  /* Typography */
+  --font-display: var(--font-space-grotesk), "Segoe UI", ui-sans-serif, sans-serif;
+  --font-body: var(--font-inter), "Segoe UI", ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), Consolas, ui-monospace, monospace;
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  overflow-x: clip;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Subtle dark scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+/* ---------------------------------------------------------------------------
+ * Surfaces — glass & glow
+ *
+ * Defined inside @layer components so Tailwind utilities (which live in
+ * @layer utilities) can override individual properties — e.g.
+ * `hover:border-accent/40` or `border-t-2` on a `.glass` element.
+ * Unlayered rules would silently beat every utility.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .glass {
+    background: color-mix(in srgb, var(--color-surface) 42%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .glass-strong {
+    background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 13%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .glow-accent {
+    box-shadow:
+      0 0 24px -6px color-mix(in srgb, var(--color-accent) 45%, transparent),
+      0 0 80px -20px color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+
+  .glow-nebula {
+    box-shadow:
+      0 0 24px -6px color-mix(in srgb, var(--color-nebula) 50%, transparent),
+      0 0 80px -20px color-mix(in srgb, var(--color-nebula) 35%, transparent);
+  }
+
+  .text-gradient {
+    background: linear-gradient(
+      100deg,
+      var(--color-ink) 10%,
+      var(--color-accent-bright) 55%,
+      var(--color-nebula-bright) 95%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Faint blueprint grid + vignette used behind sections */
+  .grid-backdrop {
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -10%,
+        color-mix(in srgb, var(--color-nebula) 12%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(color-mix(in srgb, var(--color-line) 55%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-line) 55%, transparent) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      72px 72px,
+      72px 72px;
+    mask-image: linear-gradient(to bottom, black 0%, black 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 75%, transparent 100%);
+  }
+
+  /* Hide the scrollbar on scrollable strips that provide their own affordance */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Ambient animation (CSS-only, compositor-friendly, reduced-motion aware)
+ * ------------------------------------------------------------------------- */
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.orbit-slow,
+.orbit-slower,
+.orbit-reverse {
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.orbit-slow {
+  animation: orbit-spin 70s linear infinite;
+}
+
+.orbit-slower {
+  animation: orbit-spin 110s linear infinite;
+}
+
+.orbit-reverse {
+  animation: orbit-spin 90s linear infinite reverse;
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.star-twinkle {
+  animation: star-twinkle 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.node-pulse {
+  animation: pulse-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 0.4;
+  }
+}
+
+.scroll-cue {
+  animation: scroll-cue 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-slow,
+  .orbit-slower,
+  .orbit-reverse,
+  .star-twinkle,
+  .node-pulse,
+  .scroll-cue {
+    animation: none;
+  }
+}
+
+/* Ambient loops pause while the hero is off-screen (IntersectionObserver
+ * toggles this class in OrbitalField) — saves main-thread paint on engines
+ * that don't composite SVG child animations. */
+.ambient-paused .orbit-slow,
+.ambient-paused .orbit-slower,
+.ambient-paused .orbit-reverse,
+.ambient-paused .star-twinkle {
+  animation-play-state: paused;
+}
+
+/* ---------------------------------------------------------------------------
+ * Accessibility helpers
+ * ------------------------------------------------------------------------- */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid var(--color-accent);
+  transition: top 150ms ease;
+}
+
+.skip-link:focus-visible {
+  top: 1rem;
+}
