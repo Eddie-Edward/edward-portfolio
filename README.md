@@ -50,6 +50,14 @@ JARVIS updates this site by editing `src/content/*.ts` (never rendered HTML), th
 - `GET /api/site-manifest` · `public/jarvis-site-manifest.json`
 - `docs/jarvis-update-guide.md` · `docs/jarvis-portfolio-contract.md`
 
+## Agent & maintainer docs
+
+- [CLAUDE.md](CLAUDE.md) — concise agent context: commands, rules, current state
+- [docs/project-state.md](docs/project-state.md) — what's finished, what's open, where to look first
+- [docs/jarvis-update-guide.md](docs/jarvis-update-guide.md) — how to update content safely
+- [docs/content-model.md](docs/content-model.md) — the content layer, file by file
+- [docs/jarvis-portfolio-contract.md](docs/jarvis-portfolio-contract.md) — the stable JARVIS interface
+
 ## Honesty & privacy rules
 
 No invented achievements, metrics, or employment. Uncertain details are marked `source: "todo"`.

@@ -110,5 +110,5 @@
     "Never add phone numbers, street addresses, or secrets to content files.",
     "Do not scrape rendered HTML — consume /api/jarvis/portfolio-context instead."
   ],
-  "generatedAt": "2026-07-05T06:36:29.180Z"
+  "generatedAt": "2026-07-05T06:53:26.285Z"
 }
