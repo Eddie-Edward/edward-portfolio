@@ -57,6 +57,7 @@ const nodeVariants = {
 
 export function ProjectConstellation() {
   const scopeRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
   const projects = content.projects;
   const [selectedSlug, setSelectedSlug] = useState(projects[0]?.slug ?? "");
   const selected = projects.find((p) => p.slug === selectedSlug) ?? projects[0];
@@ -69,7 +70,13 @@ export function ProjectConstellation() {
 
   const connections = useMemo(() => {
     const seen = new Set<string>();
-    const pairs: Array<{ from: { x: number; y: number }; to: { x: number; y: number }; key: string }> = [];
+    const pairs: Array<{
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+      fromSlug: string;
+      toSlug: string;
+      key: string;
+    }> = [];
     for (const p of projects) {
       for (const other of p.connections) {
         const key = [p.slug, other].sort().join("|");
@@ -77,7 +84,7 @@ export function ProjectConstellation() {
         seen.add(key);
         const from = positions.get(p.slug);
         const to = positions.get(other);
-        if (from && to) pairs.push({ from, to, key });
+        if (from && to) pairs.push({ from, to, fromSlug: p.slug, toSlug: other, key });
       }
     }
     return pairs;
@@ -108,24 +115,94 @@ export function ProjectConstellation() {
         });
 
         // ── Ambient orb drift ────────────────────────────────────────────
-        // Each orb wanders a few px around its anchor (sine out-and-back to
-        // a fresh random offset per cycle) — alive, never orbiting. The
-        // BUTTON drifts with the dot so the hit target always matches the
-        // visuals, and the label stays static outside the drift wrapper.
+        // Lissajous-style elliptical wander: x and y run as separate sine
+        // tweens with different durations, so each node traces a slow,
+        // curving path around its anchor — alive, but never a full orbit.
+        // Targets have a guaranteed minimum magnitude (a plain random range
+        // straddling zero often lands near 0 and reads as static). The
+        // whole [data-drift] group moves — dot, button, AND label — so the
+        // node reads as one visual unit and the hit target tracks it.
+        const signedRandom = (min: number, max: number) => () =>
+          gsap.utils.random(min, max) * (gsap.utils.random(0, 1) > 0.5 ? 1 : -1);
+
         const driftEls = gsap.utils.toArray<HTMLElement>("[data-drift]");
-        const drifts = driftEls.map((el, i) =>
+        const drifts = driftEls.map((el, i) => [
           gsap.to(el, {
-            x: () => gsap.utils.random(-7, 7),
-            y: () => gsap.utils.random(-5, 5),
-            duration: () => gsap.utils.random(5, 8),
+            x: signedRandom(9, 15),
+            duration: () => gsap.utils.random(6, 9),
             ease: "sine.inOut",
             repeat: -1,
             yoyo: true,
             repeatRefresh: true,
-            delay: (i % 5) * 0.7,
+            delay: (i % 5) * 0.6,
             paused: true,
           }),
-        );
+          gsap.to(el, {
+            y: signedRandom(6, 11),
+            duration: () => gsap.utils.random(7.5, 10),
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            repeatRefresh: true,
+            delay: (i % 3) * 0.8,
+            paused: true,
+          }),
+        ]);
+        const pauseNode = (i: number) => drifts[i].forEach((t) => t.pause());
+        const playNode = (i: number) => drifts[i].forEach((t) => t.play());
+
+        // ── Living edges ─────────────────────────────────────────────────
+        // Connection lines track their endpoints' live drift offsets. A
+        // single GSAP ticker callback (active only while the section is on
+        // screen) reads each node's current x/y straight from GSAP's cache
+        // (gsap.getProperty — no layout reads) and rewrites line endpoints
+        // as anchor + offset, converted from px to viewBox units. A frozen
+        // (hovered/focused) node's offsets stop changing, so its edges hold
+        // perfectly still with it — no snapping, no special cases.
+        const driftBySlug = new Map(driftEls.map((el) => [el.dataset.drift, el]));
+        const lineEls = gsap.utils.toArray<SVGLineElement>("[data-conn-line]");
+        const bindings = lineEls.map((line) => ({
+          line,
+          from: driftBySlug.get(line.dataset.from) ?? null,
+          to: driftBySlug.get(line.dataset.to) ?? null,
+          fx: Number(line.dataset.fx),
+          fy: Number(line.dataset.fy),
+          tx: Number(line.dataset.tx),
+          ty: Number(line.dataset.ty),
+        }));
+
+        // px → viewBox units (viewBox is 0-100 over a square container).
+        let unitScale = 100 / (mapRef.current?.clientWidth || 760);
+        const resizeObserver = new ResizeObserver(() => {
+          unitScale = 100 / (mapRef.current?.clientWidth || 760);
+        });
+        if (mapRef.current) resizeObserver.observe(mapRef.current);
+
+        const updateLines = () => {
+          for (let i = 0; i < bindings.length; i++) {
+            const b = bindings[i];
+            if (b.from) {
+              b.line.setAttribute(
+                "x1",
+                String(b.fx + Number(gsap.getProperty(b.from, "x")) * unitScale),
+              );
+              b.line.setAttribute(
+                "y1",
+                String(b.fy + Number(gsap.getProperty(b.from, "y")) * unitScale),
+              );
+            }
+            if (b.to) {
+              b.line.setAttribute(
+                "x2",
+                String(b.tx + Number(gsap.getProperty(b.to, "x")) * unitScale),
+              );
+              b.line.setAttribute(
+                "y2",
+                String(b.ty + Number(gsap.getProperty(b.to, "y")) * unitScale),
+              );
+            }
+          }
+        };
 
         // A node is frozen while ANY source holds it (pointer hover and
         // keyboard focus can overlap) — count holds instead of toggling,
@@ -133,28 +210,39 @@ export function ProjectConstellation() {
         const frozen = driftEls.map(() => 0);
 
         // Tick only while the constellation is on screen — and never
-        // resume a node that is currently hovered/focused.
+        // resume a node that is currently hovered/focused. The line ticker
+        // follows the same visibility gate.
         const visibility = ScrollTrigger.create({
           trigger: scopeRef.current,
           start: "top bottom",
           end: "bottom top",
-          onToggle: (self) =>
-            drifts.forEach((tween, i) => {
-              if (self.isActive && frozen[i] === 0) tween.play();
-              else tween.pause();
-            }),
+          onToggle: (self) => {
+            driftEls.forEach((_, i) => {
+              if (self.isActive && frozen[i] === 0) playNode(i);
+              else pauseNode(i);
+            });
+            if (self.isActive) {
+              // remove-first: same-callback re-adds must never double-tick.
+              gsap.ticker.remove(updateLines);
+              gsap.ticker.add(updateLines);
+              updateLines();
+            } else {
+              gsap.ticker.remove(updateLines);
+            }
+          },
         });
 
         // Freeze a node the moment the pointer or keyboard focus reaches it
-        // — the click/focus target must be perfectly stable.
+        // — the click/focus target must be perfectly stable. The label now
+        // rides inside the drift group, so hovering it freezes the node too.
         const cleanups = driftEls.map((el, i) => {
           const freeze = () => {
             frozen[i] += 1;
-            drifts[i].pause();
+            pauseNode(i);
           };
           const release = () => {
             frozen[i] = Math.max(0, frozen[i] - 1);
-            if (frozen[i] === 0 && visibility.isActive) drifts[i].play();
+            if (frozen[i] === 0 && visibility.isActive) playNode(i);
           };
           el.addEventListener("pointerenter", freeze);
           el.addEventListener("pointerleave", release);
@@ -168,7 +256,19 @@ export function ProjectConstellation() {
           };
         });
 
-        return () => cleanups.forEach((fn) => fn());
+        return () => {
+          cleanups.forEach((fn) => fn());
+          gsap.ticker.remove(updateLines);
+          resizeObserver.disconnect();
+          // setAttribute writes are outside GSAP's revert — restore anchors
+          // so a breakpoint/reduced-motion flip never strands drifted lines.
+          for (const b of bindings) {
+            b.line.setAttribute("x1", String(b.fx));
+            b.line.setAttribute("y1", String(b.fy));
+            b.line.setAttribute("x2", String(b.tx));
+            b.line.setAttribute("y2", String(b.ty));
+          }
+        };
       });
     },
     { scope: scopeRef },
@@ -177,7 +277,7 @@ export function ProjectConstellation() {
   return (
     <div ref={scopeRef} className="grid items-start gap-8 xl:grid-cols-[3fr_2fr] xl:gap-12">
       {/* ── Map (lg and up) ─────────────────────────────────────────────── */}
-      <div className="relative mx-auto hidden aspect-square w-full max-w-[760px] lg:block">
+      <div ref={mapRef} className="relative mx-auto hidden aspect-square w-full max-w-[760px] lg:block">
         <svg
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
@@ -197,9 +297,17 @@ export function ProjectConstellation() {
             />
           ))}
           {connections.map((c) => (
+            /* data-* anchors + endpoint slugs let the GSAP ticker retarget
+               each endpoint to its node's live drift offset (living graph). */
             <line
               key={c.key}
               data-conn-line
+              data-from={c.fromSlug}
+              data-to={c.toSlug}
+              data-fx={c.from.x}
+              data-fy={c.from.y}
+              data-tx={c.to.x}
+              data-ty={c.to.y}
               x1={c.from.x}
               y1={c.from.y}
               x2={c.to.x}
@@ -230,15 +338,15 @@ export function ProjectConstellation() {
                  1. anchor div — static CSS translate centers the dot on the
                     ring point (never animated; Motion/GSAP would clobber it);
                  2. [data-drift] div — GSAP ambient wander (skipped for the
-                    JARVIS core, which stays visually central);
-                 3. motion.button — pop-in variant + hover/press springs.
-                 The label lives on the static anchor so it never drifts. */
+                    JARVIS core, which stays visually central); the label
+                    lives INSIDE it so dot + label drift as one unit;
+                 3. motion.button — pop-in variant + hover/press springs. */
               <div
                 key={project.slug}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
               >
-                <div data-drift={isCenter ? undefined : true}>
+                <div data-drift={isCenter ? undefined : project.slug} className="relative">
                   <motion.button
                     type="button"
                     variants={nodeVariants}
@@ -270,20 +378,20 @@ export function ProjectConstellation() {
                       />
                     )}
                   </motion.button>
+                  {/* Redundant click affordance riding the drift group: the
+                      real control is the button (AT/keyboard use that); the
+                      label forwards clicks and moves with its dot. */}
+                  <span
+                    aria-hidden
+                    onClick={() => setSelectedSlug(project.slug)}
+                    className={cn(
+                      "absolute top-full left-1/2 mt-2 -translate-x-1/2 cursor-pointer font-mono text-[11px] whitespace-nowrap transition-colors",
+                      isSelected ? "text-ink" : "text-dim",
+                    )}
+                  >
+                    {project.name}
+                  </span>
                 </div>
-                {/* Redundant click affordance: the real control is the
-                    button (AT/keyboard use that); the static label just
-                    forwards clicks so the target isn't only the small dot. */}
-                <span
-                  aria-hidden
-                  onClick={() => setSelectedSlug(project.slug)}
-                  className={cn(
-                    "absolute top-full left-1/2 mt-2 -translate-x-1/2 cursor-pointer font-mono text-[11px] whitespace-nowrap transition-colors",
-                    isSelected ? "text-ink" : "text-dim",
-                  )}
-                >
-                  {project.name}
-                </span>
               </div>
             );
           })}

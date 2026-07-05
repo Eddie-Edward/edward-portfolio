@@ -16,7 +16,8 @@ sequences — things that respond to time and scroll. CSS owns infinite ambient 
 | Hero entrance sequence | GSAP timeline | `Hero` (masked line reveals, staggered CTAs) |
 | Hero scroll-out parallax | GSAP ScrollTrigger (scrub) | `Hero` |
 | Constellation ring/line draw-in | GSAP ScrollTrigger + stroke-dash | `ProjectConstellation` |
-| Constellation orb drift | GSAP sine `repeatRefresh` wander — lg+ only (map is hidden below), freezes while hovered/focused (counted per source), pauses off-screen; labels stay static | `ProjectConstellation` |
+| Constellation orb drift | GSAP Lissajous wander (independent x/y sine tweens, guaranteed-magnitude targets, ~±9–15px / ±6–11px over 6–10s) — lg+ only, freezes while hovered/focused (counted per source), pauses off-screen; dot + label drift as one unit | `ProjectConstellation` |
+| Constellation living edges | GSAP ticker (visibility-gated) rewrites line endpoints as anchor + live node offset via `gsap.getProperty` — no layout reads; frozen nodes hold their edges still | `ProjectConstellation` |
 | Timeline progress fill | GSAP ScrollTrigger (scrub) | `Timeline` |
 | Pointer parallax on hero field | GSAP `quickTo` | `OrbitalField` |
 | Infinite orbit rotation, twinkle, pulses | Pure CSS keyframes | `globals.css` |

@@ -3,6 +3,20 @@
 Self-review by Claude (Fable 5) of the initial build, written for Edward and for a follow-up
 Opus audit. Honest by design: this lists what's solid, what's assumed, and what's weak.
 
+## Motion micro-polish v3 (constellation)
+
+Edward found the v2 drift too subtle (±7/±5 ranges straddling zero average out near-static) and
+wanted labels moving with their orbs. v3: Lissajous-style wander — independent x/y sine tweens
+per node with different durations (6–10s) and guaranteed-magnitude signed targets (±9–15px
+horizontal, ±6–11px vertical), so every cycle visibly travels a curved path without ever
+orbiting. The label now rides inside the [data-drift] group (dot + button + label move as one
+unit; hovering the label also freezes the node). Connection lines are now a living graph: a
+single visibility-gated GSAP ticker rewrites each edge endpoint as static anchor + the node's
+live drift offset (read from GSAP's cache via `getProperty` — zero layout reads), so edges
+track drifting nodes and hold still with frozen ones; endpoints reset to anchors on teardown.
+All v2 safeguards kept: lg+ media gate, per-source freeze counting, off-screen pause,
+reduced-motion fully static (nodes and lines).
+
 ## Polish pass v2 (constellation motion + work browsing)
 
 Per Edward's feedback: (1) constellation orbs got a GSAP ambient drift — low-amplitude sine

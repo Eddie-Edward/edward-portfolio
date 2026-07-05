@@ -4,8 +4,8 @@
     {
       "name": "portfolio-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["next", "dev", "-p", "3210"],
-      "port": 3210
+      "runtimeArgs": ["next", "dev", "-p", "3211"],
+      "port": 3211
     }
   ]
 }

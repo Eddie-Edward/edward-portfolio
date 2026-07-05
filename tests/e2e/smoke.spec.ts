@@ -83,25 +83,88 @@ test.describe("constellation interaction", () => {
     test.skip(!!isMobile, "the constellation map is desktop-only");
     await page.goto("/#systems");
     const drift = page.locator("[data-drift]").first();
-    // Ambient wander engages once the section is on screen (GSAP writes an
-    // inline transform to the drift wrapper).
+    // The label rides inside the drift group — dot + name move as one unit.
+    await expect(drift.getByText("RLArena")).toBeAttached();
+    // Ambient wander engages once the section is on screen, and it must be
+    // visibly alive: displacement from the anchor exceeds 5px within one
+    // half-cycle (guaranteed-magnitude targets are ≥9px horizontal).
     await expect
       .poll(
         () =>
-          drift.evaluate(
-            (el) => el.style.transform !== "" && el.style.transform !== "none",
-          ),
-        { timeout: 10_000 },
+          drift.evaluate((el) => {
+            // GSAP may write translate(), translate3d(), or leave a matrix —
+            // the computed style always resolves to matrix/matrix3d.
+            const t = getComputedStyle(el).transform;
+            const m2 = t.match(/^matrix\(([^)]+)\)$/);
+            if (m2) {
+              const p = m2[1].split(",").map(Number);
+              return Math.hypot(p[4], p[5]);
+            }
+            const m3 = t.match(/^matrix3d\(([^)]+)\)$/);
+            if (m3) {
+              const p = m3[1].split(",").map(Number);
+              return Math.hypot(p[12], p[13]);
+            }
+            return 0;
+          }),
+        { timeout: 15_000 },
       )
-      .toBe(true);
-    // Keyboard focus freezes the drift — the target must hold still.
+      .toBeGreaterThan(5);
+    // Living graph: a connection line touching RLArena must have left its
+    // static anchor to track the drifting node (endpoints in viewBox units).
+    const line = page
+      .locator("[data-conn-line][data-from='rlarena'], [data-conn-line][data-to='rlarena']")
+      .first();
+    const lineDelta = await line.evaluate((el) => {
+      const isFrom = el.getAttribute("data-from") === "rlarena";
+      const x = Number(el.getAttribute(isFrom ? "x1" : "x2"));
+      const y = Number(el.getAttribute(isFrom ? "y1" : "y2"));
+      const ax = Number(el.getAttribute(isFrom ? "data-fx" : "data-tx"));
+      const ay = Number(el.getAttribute(isFrom ? "data-fy" : "data-ty"));
+      return Math.hypot(x - ax, y - ay);
+    });
+    expect(lineDelta).toBeGreaterThan(0.2);
+
+    // Keyboard focus freezes the drift — the target must hold still,
+    // and its connected edges must hold still with it.
     // First [data-drift] belongs to the first non-center project (RLArena).
     await page.getByRole("button", { name: /RLArena/ }).focus();
     await page.waitForTimeout(150); // let the pause land
     const before = await drift.evaluate((el) => el.style.transform);
+    const lineBefore = await line.evaluate(
+      (el) =>
+        `${el.getAttribute("x1")},${el.getAttribute("y1")},${el.getAttribute("x2")},${el.getAttribute("y2")}`,
+    );
     await page.waitForTimeout(450);
     const after = await drift.evaluate((el) => el.style.transform);
+    const lineAfter = await line.evaluate(
+      (el) =>
+        `${el.getAttribute("x1")},${el.getAttribute("y1")},${el.getAttribute("x2")},${el.getAttribute("y2")}`,
+    );
     expect(after).toBe(before);
+    expect(lineAfter).toBe(lineBefore);
+  });
+
+  test("reduced motion keeps nodes and lines fully static", async ({ page, isMobile }) => {
+    test.skip(!!isMobile, "the constellation map is desktop-only");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/#systems");
+    await page.waitForTimeout(1200);
+    const driftTransform = await page
+      .locator("[data-drift]")
+      .first()
+      .evaluate((el) => el.style.transform);
+    expect(driftTransform === "" || driftTransform === "none").toBe(true);
+    const lineDelta = await page
+      .locator("[data-conn-line]")
+      .first()
+      .evaluate((el) =>
+        Math.hypot(
+          Number(el.getAttribute("x1")) - Number(el.getAttribute("data-fx")),
+          Number(el.getAttribute("y1")) - Number(el.getAttribute("data-fy")),
+        ),
+      );
+    expect(lineDelta).toBe(0);
   });
 
   test("drifting nodes stay selectable (keyboard) and freeze on focus", async ({
