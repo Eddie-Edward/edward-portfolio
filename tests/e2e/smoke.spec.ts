@@ -37,6 +37,93 @@ test.describe("home page", () => {
   });
 });
 
+test.describe("selected work browsing", () => {
+  test("filter chips narrow the grid to matching projects", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#work").scrollIntoViewIfNeeded();
+    const cards = page.locator("[id^='project-']");
+    const allCount = await cards.count();
+    expect(allCount).toBeGreaterThanOrEqual(8);
+
+    await page.getByRole("button", { name: /^Shipped/ }).click();
+    await expect.poll(() => cards.count()).toBeLessThan(allCount);
+    // Every remaining card must actually be shipped.
+    for (const text of await cards.allTextContents()) {
+      expect(text).toContain("Shipped");
+    }
+
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBe(allCount);
+  });
+
+  test("filter chips are keyboard operable with toggle semantics", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#work").scrollIntoViewIfNeeded();
+    const cards = page.locator("[id^='project-']");
+    const allCount = await cards.count();
+
+    const featured = page.getByRole("button", { name: /^Featured/ });
+    await featured.focus();
+    await page.keyboard.press("Enter");
+    await expect(featured).toHaveAttribute("aria-current", "true");
+    await expect.poll(() => cards.count()).toBeLessThan(allCount);
+    await expect.poll(() => cards.count()).toBeGreaterThan(0);
+
+    // Re-activating the current lens returns to All.
+    await page.keyboard.press("Enter");
+    await expect.poll(() => cards.count()).toBe(allCount);
+  });
+});
+
+test.describe("constellation interaction", () => {
+  test("orbs drift ambiently while in view and freeze under focus", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!!isMobile, "the constellation map is desktop-only");
+    await page.goto("/#systems");
+    const drift = page.locator("[data-drift]").first();
+    // Ambient wander engages once the section is on screen (GSAP writes an
+    // inline transform to the drift wrapper).
+    await expect
+      .poll(
+        () =>
+          drift.evaluate(
+            (el) => el.style.transform !== "" && el.style.transform !== "none",
+          ),
+        { timeout: 10_000 },
+      )
+      .toBe(true);
+    // Keyboard focus freezes the drift — the target must hold still.
+    // First [data-drift] belongs to the first non-center project (RLArena).
+    await page.getByRole("button", { name: /RLArena/ }).focus();
+    await page.waitForTimeout(150); // let the pause land
+    const before = await drift.evaluate((el) => el.style.transform);
+    await page.waitForTimeout(450);
+    const after = await drift.evaluate((el) => el.style.transform);
+    expect(after).toBe(before);
+  });
+
+  test("drifting nodes stay selectable (keyboard) and freeze on focus", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!!isMobile, "the constellation map is desktop-only");
+    await page.goto("/");
+    await page.locator("#systems").scrollIntoViewIfNeeded();
+    // Let the pop-in stagger and ambient drift begin.
+    await page.waitForTimeout(1000);
+
+    const node = page.getByRole("button", { name: /PRSense/ });
+    await node.focus(); // focusin freezes the drift — target is stable
+    await page.keyboard.press("Enter");
+
+    const panel = page.getByRole("region", { name: "Selected system details" });
+    await expect(panel).toContainText("PRSense");
+    await expect(node).toHaveAttribute("aria-current", "true");
+  });
+});
+
 test.describe("responsive: no horizontal overflow", () => {
   test.skip(({ isMobile }) => !!isMobile, "viewport sweep runs on the desktop project only");
 

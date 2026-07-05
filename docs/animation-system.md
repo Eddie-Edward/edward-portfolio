@@ -8,13 +8,15 @@ sequences — things that respond to time and scroll. CSS owns infinite ambient 
 
 | Concern | Engine | Where |
 | --- | --- | --- |
-| Scroll reveals (sections, cards, headings) | Motion `whileInView` | `Reveal`, `ProjectCard`, `Timeline` entries |
+| Scroll reveals (sections, cards, headings) | Motion `whileInView` | `Reveal`, `WorkBrowser` card wrappers, `Timeline` entries |
 | Hover / press physics | Motion springs | `GlowButton`, constellation nodes, cards |
 | Panel swap on node selection | Motion `AnimatePresence` | `ProjectConstellation` detail panel |
+| Work filter enter/exit + grid glide | Motion `AnimatePresence` `popLayout` + `layout` | `WorkBrowser` |
 | Nav scroll-progress beam | Motion `useScroll` + `useSpring` | `SiteNav` |
 | Hero entrance sequence | GSAP timeline | `Hero` (masked line reveals, staggered CTAs) |
 | Hero scroll-out parallax | GSAP ScrollTrigger (scrub) | `Hero` |
 | Constellation ring/line draw-in | GSAP ScrollTrigger + stroke-dash | `ProjectConstellation` |
+| Constellation orb drift | GSAP sine `repeatRefresh` wander — lg+ only (map is hidden below), freezes while hovered/focused (counted per source), pauses off-screen; labels stay static | `ProjectConstellation` |
 | Timeline progress fill | GSAP ScrollTrigger (scrub) | `Timeline` |
 | Pointer parallax on hero field | GSAP `quickTo` | `OrbitalField` |
 | Infinite orbit rotation, twinkle, pulses | Pure CSS keyframes | `globals.css` |

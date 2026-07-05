@@ -1,9 +1,9 @@
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/hero/Hero";
 import { SiteNav } from "@/components/nav/SiteNav";
-import { ProjectCard } from "@/components/sections/ProjectCard";
 import { ProjectConstellation } from "@/components/sections/ProjectConstellation";
 import { Timeline } from "@/components/sections/Timeline";
+import { WorkBrowser } from "@/components/sections/WorkBrowser";
 import { Chip } from "@/components/ui/Badge";
 import { GlowButton } from "@/components/ui/GlowButton";
 import { Reveal } from "@/components/ui/Reveal";
@@ -18,7 +18,7 @@ const HORIZONS = [
 ] as const;
 
 export default function HomePage() {
-  const { profile, projects, skillGroups, achievements, coursework, roadmap, links } = content;
+  const { profile, skillGroups, achievements, coursework, roadmap, links } = content;
   const email = links.find((l) => l.kind === "email");
   const github = links.find((l) => l.kind === "github");
   const linkedin = links.find((l) => l.kind === "linkedin");
@@ -84,13 +84,9 @@ export default function HomePage() {
           <SectionHeading
             kicker="Selected work"
             title="Shipped platforms, honest status."
-            lede="Full-stack AI systems with real backends — queues, sockets, migrations, tests. Entries marked as previews are still being written; nothing here is inflated."
+            lede="Full-stack AI systems with real backends — queues, sockets, migrations, tests. Filter by lens; entries marked as previews are still being written. Nothing here is inflated."
           />
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {projects.map((project, i) => (
-              <ProjectCard key={project.slug} project={project} index={i} />
-            ))}
-          </div>
+          <WorkBrowser />
         </Section>
 
         {/* ── Timeline + proof of work ──────────────────────────────────── */}

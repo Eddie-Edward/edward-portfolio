@@ -1,0 +1,9 @@
+# Single-package repo; this file exists to persist pnpm build-script
+# approvals (created by `pnpm approve-builds`). `packages` is mandatory.
+packages:
+  - "."
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

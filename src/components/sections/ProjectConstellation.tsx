@@ -7,7 +7,7 @@ import { useMemo, useRef, useState } from "react";
 import { StatusBadge, Chip } from "@/components/ui/Badge";
 import { content } from "@/content";
 import type { Project } from "@/content/schema";
-import { gsap, NO_MOTION_PREFERENCE, useGSAP } from "@/lib/gsap";
+import { gsap, NO_MOTION_PREFERENCE, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { DUR, EASE_OUT, SPRING_SNAPPY, SPRING_SOFT } from "@/lib/motion-tokens";
 import { cn } from "@/lib/utils";
 
@@ -86,7 +86,10 @@ export function ProjectConstellation() {
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
-      mm.add(NO_MOTION_PREFERENCE, () => {
+      // The map is display:none below lg (64rem) — none of its animation
+      // work may exist there, so the media gate covers width too and
+      // matchMedia rebuilds/reverts everything across the breakpoint.
+      mm.add(`${NO_MOTION_PREFERENCE} and (min-width: 64rem)`, () => {
         gsap.from("[data-orbit-ring]", {
           scale: 0.85,
           opacity: 0,
@@ -103,6 +106,69 @@ export function ProjectConstellation() {
           ease: "power2.inOut",
           scrollTrigger: { trigger: scopeRef.current, start: "top 65%" },
         });
+
+        // ── Ambient orb drift ────────────────────────────────────────────
+        // Each orb wanders a few px around its anchor (sine out-and-back to
+        // a fresh random offset per cycle) — alive, never orbiting. The
+        // BUTTON drifts with the dot so the hit target always matches the
+        // visuals, and the label stays static outside the drift wrapper.
+        const driftEls = gsap.utils.toArray<HTMLElement>("[data-drift]");
+        const drifts = driftEls.map((el, i) =>
+          gsap.to(el, {
+            x: () => gsap.utils.random(-7, 7),
+            y: () => gsap.utils.random(-5, 5),
+            duration: () => gsap.utils.random(5, 8),
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            repeatRefresh: true,
+            delay: (i % 5) * 0.7,
+            paused: true,
+          }),
+        );
+
+        // A node is frozen while ANY source holds it (pointer hover and
+        // keyboard focus can overlap) — count holds instead of toggling,
+        // so releasing one source never unfreezes the other's.
+        const frozen = driftEls.map(() => 0);
+
+        // Tick only while the constellation is on screen — and never
+        // resume a node that is currently hovered/focused.
+        const visibility = ScrollTrigger.create({
+          trigger: scopeRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          onToggle: (self) =>
+            drifts.forEach((tween, i) => {
+              if (self.isActive && frozen[i] === 0) tween.play();
+              else tween.pause();
+            }),
+        });
+
+        // Freeze a node the moment the pointer or keyboard focus reaches it
+        // — the click/focus target must be perfectly stable.
+        const cleanups = driftEls.map((el, i) => {
+          const freeze = () => {
+            frozen[i] += 1;
+            drifts[i].pause();
+          };
+          const release = () => {
+            frozen[i] = Math.max(0, frozen[i] - 1);
+            if (frozen[i] === 0 && visibility.isActive) drifts[i].play();
+          };
+          el.addEventListener("pointerenter", freeze);
+          el.addEventListener("pointerleave", release);
+          el.addEventListener("focusin", freeze);
+          el.addEventListener("focusout", release);
+          return () => {
+            el.removeEventListener("pointerenter", freeze);
+            el.removeEventListener("pointerleave", release);
+            el.removeEventListener("focusin", freeze);
+            el.removeEventListener("focusout", release);
+          };
+        });
+
+        return () => cleanups.forEach((fn) => fn());
       });
     },
     { scope: scopeRef },
@@ -160,55 +226,64 @@ export function ProjectConstellation() {
             const isCenter = project.constellation.orbit === 0;
             const isSelected = project.slug === selectedSlug;
             return (
-              /* Anchoring wrapper is NOT animated — Motion writes inline
-                 transforms on the button, which would clobber CSS translate
-                 utilities. The button's box is just the dot, so the dot
-                 center lands exactly on the ring point; the label hangs
-                 below without affecting geometry. */
+              /* Three layers, each owning exactly one transform:
+                 1. anchor div — static CSS translate centers the dot on the
+                    ring point (never animated; Motion/GSAP would clobber it);
+                 2. [data-drift] div — GSAP ambient wander (skipped for the
+                    JARVIS core, which stays visually central);
+                 3. motion.button — pop-in variant + hover/press springs.
+                 The label lives on the static anchor so it never drifts. */
               <div
                 key={project.slug}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
               >
-                <motion.button
-                  type="button"
-                  variants={nodeVariants}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.94 }}
-                  transition={SPRING_SNAPPY}
-                  onClick={() => setSelectedSlug(project.slug)}
-                  aria-current={isSelected ? "true" : undefined}
-                  aria-label={`${project.name} — ${project.tagline}`}
-                  className="relative flex items-center justify-center"
-                >
-                  {isCenter ? (
-                    <span
-                      className={cn(
-                        "glow-accent node-pulse flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-accent to-nebula font-display text-[11px] font-bold tracking-widest text-void",
-                        isSelected && "ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
-                      )}
-                    >
-                      JARVIS
-                    </span>
-                  ) : (
-                    <span
-                      className={cn(
-                        "rounded-full",
-                        DOT_SIZE[project.constellation.size],
-                        project.status === "shipped" ? "glow-accent bg-accent" : "glow-nebula bg-nebula-bright",
-                        isSelected && "ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
-                      )}
-                    />
-                  )}
-                  <span
-                    className={cn(
-                      "absolute top-full left-1/2 mt-2 -translate-x-1/2 font-mono text-[11px] whitespace-nowrap transition-colors",
-                      isSelected ? "text-ink" : "text-dim",
-                    )}
+                <div data-drift={isCenter ? undefined : true}>
+                  <motion.button
+                    type="button"
+                    variants={nodeVariants}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.94 }}
+                    transition={SPRING_SNAPPY}
+                    onClick={() => setSelectedSlug(project.slug)}
+                    aria-current={isSelected ? "true" : undefined}
+                    aria-label={`${project.name} — ${project.tagline}`}
+                    className="relative flex items-center justify-center"
                   >
-                    {project.name}
-                  </span>
-                </motion.button>
+                    {isCenter ? (
+                      <span
+                        className={cn(
+                          "glow-accent node-pulse flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-accent to-nebula font-display text-[11px] font-bold tracking-widest text-void",
+                          isSelected && "ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
+                        )}
+                      >
+                        JARVIS
+                      </span>
+                    ) : (
+                      <span
+                        className={cn(
+                          "rounded-full",
+                          DOT_SIZE[project.constellation.size],
+                          project.status === "shipped" ? "glow-accent bg-accent" : "glow-nebula bg-nebula-bright",
+                          isSelected && "ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
+                        )}
+                      />
+                    )}
+                  </motion.button>
+                </div>
+                {/* Redundant click affordance: the real control is the
+                    button (AT/keyboard use that); the static label just
+                    forwards clicks so the target isn't only the small dot. */}
+                <span
+                  aria-hidden
+                  onClick={() => setSelectedSlug(project.slug)}
+                  className={cn(
+                    "absolute top-full left-1/2 mt-2 -translate-x-1/2 cursor-pointer font-mono text-[11px] whitespace-nowrap transition-colors",
+                    isSelected ? "text-ink" : "text-dim",
+                  )}
+                >
+                  {project.name}
+                </span>
               </div>
             );
           })}
@@ -265,7 +340,9 @@ export function ProjectConstellation() {
             </div>
             {selected.todo ? (
               <p className="mt-4 font-mono text-[11px] text-dim">
-                ◌ Some details are still being written — treat this entry as a preview.
+                {selected.source === "todo"
+                  ? "◌ Preview entry — details pending confirmation."
+                  : "◌ Verified project — some public details are still being written."}
               </p>
             ) : null}
             <div className="mt-6 flex flex-wrap items-center gap-4">

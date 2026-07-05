@@ -5,37 +5,29 @@ import { motion } from "motion/react";
 
 import { StatusBadge, Chip } from "@/components/ui/Badge";
 import type { Project } from "@/content/schema";
-import { riseVariants, SPRING_SOFT, VIEWPORT_ONCE } from "@/lib/motion-tokens";
+import { SPRING_SOFT } from "@/lib/motion-tokens";
 import { cn } from "@/lib/utils";
 
 /**
- * Canonical project card: reveal on scroll (Motion), hover lift, gradient
- * hairline for featured work. Every fact comes from src/content/projects.ts.
+ * Canonical project card: hover lift physics + gradient hairline for
+ * featured work. Every fact comes from src/content/projects.ts.
+ *
+ * Scroll reveal, filter enter/exit, and layout glide are owned by the
+ * parent (WorkBrowser) — hover physics must live on its own element so
+ * gesture-end never replays a delayed reveal transition.
  */
-export function ProjectCard({ project, index = 0 }: { project: Project; index?: number }) {
+export function ProjectCard({ project }: { project: Project }) {
   const showTodoNote = project.source === "todo";
   return (
-    /* Reveal (outer) and hover physics (inner) live on separate elements:
-       returning from a gesture re-enters the active variant, and the reveal
-       variant carries a stagger delay that must never gate hover-out. */
-    <motion.div
-      data-reveal
-      variants={riseVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={VIEWPORT_ONCE}
-      custom={index % 3}
-      className="h-full"
+    <motion.article
+      id={`project-${project.slug}`}
+      whileHover={{ y: -6 }}
+      transition={SPRING_SOFT}
+      className={cn(
+        "glass relative flex h-full scroll-mt-28 flex-col gap-4 overflow-hidden rounded-2xl p-6 transition-colors hover:border-accent/40",
+        project.featured && "border-t-2 border-t-accent/60",
+      )}
     >
-      <motion.article
-        id={`project-${project.slug}`}
-        whileHover={{ y: -6 }}
-        transition={SPRING_SOFT}
-        className={cn(
-          "glass relative flex h-full scroll-mt-28 flex-col gap-4 overflow-hidden rounded-2xl p-6 transition-colors hover:border-accent/40",
-          project.featured && "border-t-2 border-t-accent/60",
-        )}
-      >
       <div className="flex items-center justify-between gap-3">
         <StatusBadge status={project.status} />
         <span className="font-mono text-[11px] text-dim">{project.period}</span>
@@ -94,8 +86,7 @@ export function ProjectCard({ project, index = 0 }: { project: Project; index?: 
             {link.label} ↗
           </a>
         ))}
-        </div>
-      </motion.article>
-    </motion.div>
+      </div>
+    </motion.article>
   );
 }

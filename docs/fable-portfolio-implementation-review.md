@@ -3,6 +3,21 @@
 Self-review by Claude (Fable 5) of the initial build, written for Edward and for a follow-up
 Opus audit. Honest by design: this lists what's solid, what's assumed, and what's weak.
 
+## Polish pass v2 (constellation motion + work browsing)
+
+Per Edward's feedback: (1) constellation orbs got a GSAP ambient drift — low-amplitude sine
+wander around each anchor (never full orbits), lg+ only, frozen while hovered/focused (freeze
+holds are counted per source so overlapping hover+focus can't fight), paused off-screen, labels
+static and now click-forwarding; JARVIS core stays anchored at center. (2) Selected Work became
+`WorkBrowser`: filter chips (Featured/Shipped/Active/AI Systems/Full-Stack/Robotics/Research/
+Previews) with live counts, `aria-current` selection, re-tap-to-reset, an `aria-atomic` result
+announcer, and `AnimatePresence popLayout` + `layout="position"` grid transitions. Filters are
+pure view predicates over schema fields — no facts moved into components. A second adversarial
+review round (18 agents) ran on this diff; all 15 confirmed findings were fixed pre-commit,
+including a mobile display:none animation leak, a focus-vs-scroll drift race, dead mobile
+anchors under active filters (hashchange reset), and an AI Systems lens that missed the
+flagship AI platforms (multi-signal predicate).
+
 ## Adversarial review round (pre-commit)
 
 Before the first commit, a 60-agent review swarm (6 specialist finders × react-next, animation,
