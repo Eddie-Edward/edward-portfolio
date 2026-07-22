@@ -1,6 +1,6 @@
 # edward-portfolio — agent context
 
-Edward Lei's cinematic portfolio (AI systems builder, UMich CS '29). Next.js 15 App Router +
+Edward Lei's cinematic portfolio (AI systems builder, UMich CS '28). Next.js 15 App Router +
 TS + Tailwind v4 + Motion + GSAP + Zod + Playwright. **Every fact on the site lives in
 `src/content/*.ts`** (Zod-validated); UI is a pure function of that content layer. Built to be
 updated by JARVIS (Edward's AI system) via structured edits — never by editing rendered HTML.

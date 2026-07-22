@@ -27,7 +27,15 @@ const FORBIDDEN_CLAIMS: Array<{ label: string; pattern: RegExp }> = [
   },
 ];
 
-const PAGES = ["/", "/projects/interviewcopilot", "/projects/jarvis-os"];
+// Every rendered route: home + all five case-study pages.
+const PAGES = [
+  "/",
+  "/projects/jarvis-os",
+  "/projects/lockin",
+  "/projects/interviewcopilot",
+  "/projects/rlarena",
+  "/projects/prsense",
+];
 
 test.describe("truth alignment", () => {
   test.skip(({ isMobile }) => !!isMobile, "content is identical across devices");

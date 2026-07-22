@@ -96,6 +96,10 @@ export function WorkBrowser() {
     const revealAnchorTarget = () => {
       const hash = window.location.hash;
       if (!hash.startsWith("#project-")) return;
+      // Already rendered under the current lens (e.g. a featured card on
+      // initial load)? Leave the filter alone — resetting would reflow the
+      // grid out from under the browser's native fragment scroll.
+      if (document.getElementById(hash.slice(1))) return;
       setActiveFilter("all");
       window.setTimeout(() => {
         document.getElementById(hash.slice(1))?.scrollIntoView();
