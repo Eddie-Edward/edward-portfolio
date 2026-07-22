@@ -32,7 +32,7 @@ export const projects: Project[] = [
       "Desktop application under active development in a private repository.",
       "Designed to orchestrate Edward's other systems — this portfolio ships a JARVIS compatibility layer (structured content, read-only API, machine-readable manifest).",
     ],
-    stack: ["TypeScript", "Electron", "AI agents", "Claude API"],
+    stack: ["TypeScript", "OpenAI Realtime", "AI agents", "packaged desktop runtime"],
     links: [],
     connections: ["edward-portfolio", "careeros", "contentos", "rlarena"],
     constellation: { orbit: 0, angle: 0, size: "lg" },
@@ -44,7 +44,7 @@ export const projects: Project[] = [
         "A compatibility contract with this portfolio: structured content files, Zod validation, a read-only API, and a site manifest JARVIS can read to plan updates.",
       ],
       engineering: [
-        "Agent orchestration around the Claude API.",
+        "Agent orchestration around OpenAI Realtime voice and approval-gated local actions.",
         "Update safety by design: JARVIS edits typed content files and runs schema validation — it never scrapes or rewrites rendered HTML.",
       ],
       outcome:
@@ -167,7 +167,7 @@ export const projects: Project[] = [
   {
     slug: "interviewcopilot",
     name: "InterviewCopilot",
-    tagline: "Claude-powered interview training",
+    tagline: "Provider-pluggable interview preparation",
     category: "platform",
     status: "shipped",
     featured: true,
@@ -177,9 +177,9 @@ export const projects: Project[] = [
     summary:
       "A full-stack AI interview platform that simulates SWE, AI/ML, data-science, and behavioral interviews — adaptive follow-ups, knowledge-gap tracking, and structured feedback reports paired with study plans.",
     highlights: [
-      "Provider-pluggable LLM services with local fallback.",
+      "Provider-pluggable interview and evaluation services with deterministic local defaults and environment-gated external-provider stubs.",
       "Adaptive follow-ups, knowledge-gap tracking, and structured feedback with study plans.",
-      "72 passing tests across Dockerized services.",
+      "32/32 backend tests passed at the last directly verified checkpoint.",
     ],
     stack: [
       "React",
@@ -189,15 +189,11 @@ export const projects: Project[] = [
       "Redis/RQ",
       "WebSockets",
       "Docker",
-      "Claude API",
+      "Provider interfaces",
     ],
-    links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/Eddie-Edward/interviewcopilot",
-        kind: "github",
-      },
-    ],
+    // Public repository link removed 2026-07-21: the previous GitHub URL
+    // returned 404. Restore only with a working URL from Edward.
+    links: [],
     connections: ["rlarena", "careeros"],
     constellation: { orbit: 1, angle: 260, size: "lg" },
     caseStudy: {
@@ -205,15 +201,16 @@ export const projects: Project[] = [
         "Interview prep tools are mostly static question banks. Real interviews adapt to your answers. Edward built an interviewer that does the same — and tells you exactly where your knowledge gaps are.",
       built: [
         "A full-stack platform simulating SWE, AI/ML, data-science, and behavioral interviews over WebSockets.",
-        "Provider-pluggable LLM services around the Claude API, with a local fallback provider.",
+        "Provider-pluggable interview and evaluation services with deterministic local defaults and environment-gated external-provider stubs.",
         "Adaptive follow-up questioning, knowledge-gap tracking, and structured feedback reports paired with study plans.",
       ],
       engineering: [
         "Pydantic JSON validation on every LLM response — malformed model output never reaches the UI.",
         "Retry handling and environment-based secret management.",
-        "72 passing tests across Dockerized services.",
+        "32/32 backend tests passed at the last directly verified checkpoint.",
       ],
-      outcome: "Shipped and public on GitHub.",
+      outcome:
+        "Working local MVP at the last verified checkpoint. Public repository link pending correction.",
       future:
         "Feed interview performance into CareerOS so prep, applications, and feedback share one loop.",
     },

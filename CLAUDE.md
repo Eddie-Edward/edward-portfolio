@@ -56,8 +56,8 @@ Personal GitHub repo → Vercel Hobby. No env vars required for v1. See
 - Selected Work filter chips: acceptable — no carousel.
 - Constellation motion (drift amplitude/speed, living edges): may still be tuned to taste —
   knobs in `src/components/sections/ProjectConstellation.tsx` (`signedRandom` ranges).
-- Wording like "shipped" for the Jun 2026 platforms needs Edward's explicit sign-off
-  (resume says "built" + public GitHub repos).
+- Jun 2026 platforms use the conservative "built" wording (applied 2026-07-21 per the
+  recruiter-readiness plan). "Shipped" may return only with Edward's explicit sign-off.
 
 More: `docs/project-state.md` (current state), `docs/content-model.md`,
 `docs/animation-system.md`, `docs/design-system.md`,

@@ -63,7 +63,7 @@ export const timeline: TimelineEntry[] = [
     location: "Ann Arbor, MI",
     kind: "education",
     summary:
-      "Began engineering study — Computer Science with minors in Mathematics and Entrepreneurship. Expected graduation May 2029.",
+      "Began engineering study — Computer Science with minors in Mathematics and Entrepreneurship. Expected graduation May 2028.",
     details: [
       "Coursework: Data Structures and Algorithms, Discrete Mathematics, Linear Algebra, Computers and Math for AI.",
     ],
@@ -73,14 +73,14 @@ export const timeline: TimelineEntry[] = [
     id: "ship-month",
     period: "Jun 2026",
     sortKey: "2026-06",
-    title: "Shipped three full-stack AI platforms",
+    title: "Built three full-stack AI platforms",
     kind: "milestone",
     summary:
-      "Designed, built, and shipped RLArena, PRSense, and InterviewCopilot — RL training, AI code review, and AI interview prep — each a full-stack platform with React, FastAPI, PostgreSQL, Redis/RQ, and Docker.",
+      "Designed and built RLArena, PRSense, and InterviewCopilot — RL training, AI code review, and interview prep — each a full-stack platform with React, FastAPI, PostgreSQL, Redis/RQ, and Docker.",
     details: [
       "RLArena: DQN/Double DQN training with live WebSocket telemetry, replays, and leaderboards.",
       "PRSense: repo-aware diff analysis with explainable, severity-classified findings.",
-      "InterviewCopilot: adaptive AI interviews with knowledge-gap tracking and 72 passing backend tests.",
+      "InterviewCopilot: adaptive interview practice with knowledge-gap tracking and 32/32 backend tests at the last directly verified checkpoint.",
     ],
     source: "resume",
   },

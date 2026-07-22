@@ -18,8 +18,8 @@ export const profile: Profile = {
   location: "Ann Arbor, MI",
   email: "eddiel@umich.edu",
   bio: [
-    "I'm Edward — a computer science engineering student at the University of Michigan (B.S.E. Computer Science, minors in Mathematics and Entrepreneurship, class of 2029) who builds AI systems end to end.",
-    "In June 2026 I designed, built, and shipped three full-stack AI platforms — a reinforcement-learning training arena, a repo-aware AI code review tool, and a Claude-powered interview trainer — each with React/TypeScript frontends, FastAPI backends, PostgreSQL/Redis infrastructure, and Dockerized deployment.",
+    "I'm Edward — a computer science engineering student at the University of Michigan (B.S.E. Computer Science, minors in Mathematics and Entrepreneurship, class of 2028) who builds software and AI systems end to end.",
+    "In June 2026 I built three full-stack platforms: a reinforcement-learning training arena, a repo-aware code-review tool, and a provider-pluggable interview-preparation system. Each uses a React/TypeScript frontend, a FastAPI backend, PostgreSQL/Redis infrastructure, and Docker.",
     "Right now I'm a software intern at Shift Digital, and I'm building JARVIS — a personal AI operating system for orchestrating my projects. This site is built for it: every fact lives in a structured content layer designed for JARVIS to update.",
   ],
   education: {
@@ -27,6 +27,6 @@ export const profile: Profile = {
     degree: "B.S.E. Computer Science",
     minors: ["Mathematics", "Entrepreneurship"],
     location: "Ann Arbor, MI",
-    expectedGraduation: "May 2029",
+    expectedGraduation: "May 2028",
   },
 };

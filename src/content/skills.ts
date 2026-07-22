@@ -13,7 +13,7 @@ export const skillGroups: SkillGroup[] = [
     label: "AI Systems",
     blurb: "Turning models into products — agents, providers, feedback loops.",
     skills: [
-      { name: "Claude API" },
+      { name: "OpenAI Realtime", note: "live voice acceptance in JARVIS" },
       { name: "LLM provider design", note: "provider-pluggable services with local fallback" },
       { name: "Reinforcement learning", note: "DQN / Double DQN from scratch" },
       { name: "Agent orchestration", note: "JARVIS, contentOS" },
@@ -64,7 +64,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "infra",
     label: "Infra & DevTools",
-    blurb: "Everything ships in containers with migrations and CI.",
+    blurb: "Containers, persistence, migrations, and local verification across the full-stack projects.",
     skills: [
       { name: "Docker" },
       { name: "PostgreSQL" },

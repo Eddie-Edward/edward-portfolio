@@ -18,7 +18,7 @@ export function Hero() {
   const { profile, links } = content;
   const github = links.find((l) => l.kind === "github");
   const email = links.find((l) => l.kind === "email");
-  // "May 2029" → "2029"; derived so a content edit updates the hero too.
+  // "May 2028" → "2028"; derived so a content edit updates the hero too.
   const classYear = profile.education.expectedGraduation.split(" ").pop();
 
   useGSAP(

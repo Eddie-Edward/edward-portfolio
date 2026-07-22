@@ -7,13 +7,13 @@ import type { Achievement } from "./schema";
 export const achievements: Achievement[] = [
   {
     id: "three-platforms",
-    text: "Shipped three full-stack AI platforms in June 2026 — RLArena, PRSense, and InterviewCopilot.",
+    text: "Built three full-stack AI platforms in June 2026 — RLArena, PRSense, and InterviewCopilot.",
     context: "Each: React/TypeScript, FastAPI, PostgreSQL, Redis/RQ, Docker.",
     source: "resume",
   },
   {
     id: "interviewcopilot-tests",
-    text: "Hardened InterviewCopilot's backend to 72 passing tests across Dockerized services.",
+    text: "Verified InterviewCopilot's backend with 32/32 passing tests at the last directly verified checkpoint.",
     context: "Pydantic JSON validation, retry handling, env-based secret management.",
     source: "resume",
   },
