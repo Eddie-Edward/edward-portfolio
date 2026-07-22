@@ -201,6 +201,21 @@ body {
   animation: pulse-glow 3.2s ease-in-out infinite;
 }
 
+/* One restrained pulse when a constellation node becomes selected —
+   runs once per selection, never loops. */
+@keyframes select-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+.node-select-pulse {
+  animation: select-pulse 0.7s ease-out 1;
+}
+
 @keyframes scroll-cue {
   0%,
   100% {
@@ -223,6 +238,7 @@ body {
   .orbit-reverse,
   .star-twinkle,
   .node-pulse,
+  .node-select-pulse,
   .scroll-cue {
     animation: none;
   }

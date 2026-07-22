@@ -296,29 +296,42 @@ export function ProjectConstellation() {
               strokeWidth="0.18"
             />
           ))}
-          {connections.map((c) => (
-            /* data-* anchors + endpoint slugs let the GSAP ticker retarget
-               each endpoint to its node's live drift offset (living graph). */
-            <line
-              key={c.key}
-              data-conn-line
-              data-from={c.fromSlug}
-              data-to={c.toSlug}
-              data-fx={c.from.x}
-              data-fy={c.from.y}
-              data-tx={c.to.x}
-              data-ty={c.to.y}
-              x1={c.from.x}
-              y1={c.from.y}
-              x2={c.to.x}
-              y2={c.to.y}
-              pathLength={1}
-              strokeDasharray={1}
-              strokeDashoffset={0}
-              stroke="color-mix(in srgb, var(--color-accent) 35%, transparent)"
-              strokeWidth="0.16"
-            />
-          ))}
+          {connections.map((c) => {
+            // Selection semantics drive edge hierarchy: edges touching the
+            // selected node brighten, everything else recedes. Pure CSS
+            // opacity transition — no extra animation loop.
+            const touchesSelected =
+              c.fromSlug === selectedSlug || c.toSlug === selectedSlug;
+            return (
+              /* data-* anchors + endpoint slugs let the GSAP ticker retarget
+                 each endpoint to its node's live drift offset (living graph). */
+              <line
+                key={c.key}
+                data-conn-line
+                data-from={c.fromSlug}
+                data-to={c.toSlug}
+                data-fx={c.from.x}
+                data-fy={c.from.y}
+                data-tx={c.to.x}
+                data-ty={c.to.y}
+                x1={c.from.x}
+                y1={c.from.y}
+                x2={c.to.x}
+                y2={c.to.y}
+                pathLength={1}
+                strokeDasharray={1}
+                strokeDashoffset={0}
+                stroke={
+                  touchesSelected
+                    ? "color-mix(in srgb, var(--color-accent) 70%, transparent)"
+                    : "color-mix(in srgb, var(--color-accent) 35%, transparent)"
+                }
+                strokeWidth={touchesSelected ? "0.24" : "0.16"}
+                opacity={touchesSelected ? 1 : 0.3}
+                style={{ transition: "opacity 0.35s ease, stroke 0.35s ease" }}
+              />
+            );
+          })}
         </svg>
 
         <motion.div
@@ -362,18 +375,28 @@ export function ProjectConstellation() {
                       <span
                         className={cn(
                           "glow-accent node-pulse flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-accent to-nebula font-display text-[11px] font-bold tracking-widest text-void",
-                          isSelected && "ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
+                          isSelected &&
+                            "node-select-pulse ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
                         )}
                       >
                         JARVIS
                       </span>
                     ) : (
+                      /* Featured nodes keep their glow; secondary systems sit
+                         quieter (no glow, slightly translucent) so the four
+                         resume projects carry the visual hierarchy. */
                       <span
                         className={cn(
                           "rounded-full",
                           DOT_SIZE[project.constellation.size],
-                          project.status === "shipped" ? "glow-accent bg-accent" : "glow-nebula bg-nebula-bright",
-                          isSelected && "ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
+                          project.status === "shipped" ? "bg-accent" : "bg-nebula-bright",
+                          project.featured
+                            ? project.status === "shipped"
+                              ? "glow-accent"
+                              : "glow-nebula"
+                            : "opacity-70",
+                          isSelected &&
+                            "node-select-pulse opacity-100 ring-2 ring-accent-bright ring-offset-2 ring-offset-void",
                         )}
                       />
                     )}
@@ -385,8 +408,14 @@ export function ProjectConstellation() {
                     aria-hidden
                     onClick={() => setSelectedSlug(project.slug)}
                     className={cn(
-                      "absolute top-full left-1/2 mt-2 -translate-x-1/2 cursor-pointer font-mono text-[11px] whitespace-nowrap transition-colors",
-                      isSelected ? "text-ink" : "text-dim",
+                      "absolute top-full left-1/2 mt-2 -translate-x-1/2 cursor-pointer font-mono whitespace-nowrap transition-colors",
+                      // Label hierarchy mirrors the dot hierarchy: featured
+                      // labels read stronger, secondary labels sit quieter
+                      // (still ≥10px mono on void for legibility).
+                      project.featured || isCenter
+                        ? "text-[11px] font-medium"
+                        : "text-[10px]",
+                      isSelected ? "text-ink" : project.featured || isCenter ? "text-mist" : "text-dim",
                     )}
                   >
                     {project.name}
@@ -436,11 +465,25 @@ export function ProjectConstellation() {
           >
             <div className="flex items-center justify-between gap-4">
               <StatusBadge status={selected.status} />
-              <span className="font-mono text-[11px] text-dim">{selected.period}</span>
+              <span className="font-mono text-[11px] text-dim">
+                {selected.period} · {selected.role}
+              </span>
             </div>
             <h3 className="mt-4 font-display text-2xl font-semibold">{selected.name}</h3>
             <p className="mt-1 text-sm text-accent">{selected.tagline}</p>
             <p className="mt-4 text-sm leading-relaxed text-mist">{selected.summary}</p>
+            {selected.highlights.length > 0 ? (
+              <ul role="list" className="mt-4 space-y-1.5">
+                {selected.highlights.slice(0, 3).map((h) => (
+                  <li key={h} className="flex gap-2 text-[13px] leading-relaxed text-mist">
+                    <span className="mt-0.5 text-accent" aria-hidden>
+                      ◆
+                    </span>
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             <div className="mt-5 flex flex-wrap gap-2">
               {selected.stack.map((tech) => (
                 <Chip key={tech}>{tech}</Chip>

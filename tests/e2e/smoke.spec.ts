@@ -155,6 +155,49 @@ test.describe("constellation interaction", () => {
     expect(lineAfter).toBe(lineBefore);
   });
 
+  test("selecting a node brightens its edges and fades unrelated ones", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!!isMobile, "the constellation map is desktop-only");
+    await page.goto("/#systems");
+    // Focus freezes the drifting node, then Enter selects it — clicking a
+    // moving target is flaky by design (drift pauses only on hover/focus).
+    const node = page.getByRole("button", { name: /RLArena/ });
+    await node.focus();
+    await page.keyboard.press("Enter");
+
+    // Edge touching the selected node carries full opacity …
+    const connected = page
+      .locator("[data-conn-line][data-from='rlarena'], [data-conn-line][data-to='rlarena']")
+      .first();
+    await expect(connected).toHaveAttribute("opacity", "1");
+    // … while an edge touching neither endpoint recedes.
+    const unrelated = page
+      .locator("[data-conn-line][data-from='contentos'], [data-conn-line][data-to='contentos']")
+      .first();
+    await expect(unrelated).toHaveAttribute("opacity", "0.3");
+
+    // The detail panel shows role and up to three evidence bullets.
+    const panel = page.getByRole("region", { name: "Selected system details" });
+    await expect(panel).toContainText("Creator & Developer");
+    await expect(panel).toContainText("DQN and Double DQN");
+  });
+
+  test("mobile node list shows featured systems first", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "the node list is the mobile fallback");
+    await page.goto("/#systems");
+    const hrefs = await page
+      .locator("#systems a[href^='#project-']")
+      .evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+    expect(hrefs.slice(0, 4)).toEqual([
+      "#project-jarvis-os",
+      "#project-lockin",
+      "#project-interviewcopilot",
+      "#project-rlarena",
+    ]);
+  });
+
   test("reduced motion keeps nodes and lines fully static", async ({ page, isMobile }) => {
     test.skip(!!isMobile, "the constellation map is desktop-only");
     await page.emulateMedia({ reducedMotion: "reduce" });
