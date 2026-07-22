@@ -2,6 +2,7 @@
   "name": "edward-portfolio",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.9.0",
   "description": "Edward Lei — cinematic personal portfolio. Structured content layer, read-only API, JARVIS-compatible.",
   "scripts": {
     "dev": "next dev",

@@ -328,7 +328,9 @@ export function ProjectConstellation() {
                 }
                 strokeWidth={touchesSelected ? "0.24" : "0.16"}
                 opacity={touchesSelected ? 1 : 0.3}
-                style={{ transition: "opacity 0.35s ease, stroke 0.35s ease" }}
+                style={{
+                  transition: "opacity 0.35s ease, stroke 0.35s ease, stroke-width 0.35s ease",
+                }}
               />
             );
           })}

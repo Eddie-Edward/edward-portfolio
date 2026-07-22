@@ -46,7 +46,7 @@ const AI_SIGNAL = /\bai\b|llm|claude|pytorch|agent|reinforcement/i;
 const FILTERS: FilterDef[] = [
   { id: "all", label: "All", match: () => true },
   { id: "featured", label: "Featured", match: (p) => p.featured },
-  { id: "shipped", label: "Shipped", match: (p) => p.status === "shipped" },
+  { id: "shipped", label: "Built", match: (p) => p.status === "shipped" },
   {
     id: "active",
     label: "Active",
@@ -101,6 +101,10 @@ export function WorkBrowser() {
         document.getElementById(hash.slice(1))?.scrollIntoView();
       }, 80);
     };
+    // Also reconcile on mount: a direct load of /#project-<slug> never fires
+    // hashchange, and the Featured default would leave non-featured anchor
+    // targets out of the DOM entirely.
+    revealAnchorTarget();
     window.addEventListener("hashchange", revealAnchorTarget);
     return () => window.removeEventListener("hashchange", revealAnchorTarget);
   }, []);

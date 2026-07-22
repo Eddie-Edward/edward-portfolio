@@ -52,15 +52,22 @@ test.describe("selected work browsing", () => {
     await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
     const allCount = await cards.count();
 
-    await page.getByRole("button", { name: /^Shipped/ }).click();
+    await page.getByRole("button", { name: /^Built/ }).click();
     await expect.poll(() => cards.count()).toBeLessThan(allCount);
-    // Every remaining card must actually be shipped.
+    // Every remaining card must actually carry the built (shipped) status.
     for (const text of await cards.allTextContents()) {
-      expect(text).toContain("Shipped");
+      expect(text).toContain("Built");
     }
 
     await page.getByRole("button", { name: /^All/ }).click();
     await expect.poll(() => cards.count()).toBe(allCount);
+  });
+
+  test("direct load of a non-featured project anchor reveals its card", async ({ page }) => {
+    // A shared/bookmarked URL never fires hashchange — the mount-time
+    // reconcile must reset the Featured default so the target card exists.
+    await page.goto("/#project-prsense");
+    await expect(page.locator("#project-prsense")).toBeVisible();
   });
 
   test("filter chips are keyboard operable with toggle semantics", async ({ page }) => {
@@ -71,7 +78,7 @@ test.describe("selected work browsing", () => {
     await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
     const allCount = await cards.count();
 
-    const shipped = page.getByRole("button", { name: /^Shipped/ });
+    const shipped = page.getByRole("button", { name: /^Built/ });
     await shipped.focus();
     await page.keyboard.press("Enter");
     await expect(shipped).toHaveAttribute("aria-current", "true");

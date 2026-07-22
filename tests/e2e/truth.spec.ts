@@ -18,6 +18,13 @@ const FORBIDDEN_CLAIMS: Array<{ label: string; pattern: RegExp }> = [
     label: "broken InterviewCopilot repo link",
     pattern: /github\.com\/Eddie-Edward\/interviewcopilot/i,
   },
+  {
+    // Conservative default until Edward signs off on stronger wording: the
+    // recruiter-facing word is "Built". (The lowercase machine-readable
+    // status enum value "shipped" is allowed — this is case-sensitive.)
+    label: "unapproved 'Shipped' wording",
+    pattern: /Shipped/,
+  },
 ];
 
 const PAGES = ["/", "/projects/interviewcopilot", "/projects/jarvis-os"];
