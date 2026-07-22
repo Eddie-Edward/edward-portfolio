@@ -57,6 +57,37 @@ test.describe("truth alignment", () => {
     await expect(page.getByText("Expected May 2028")).toBeVisible();
   });
 
+  test("featured set is exactly the four resume projects", async ({ request }) => {
+    const res = await request.get("/api/projects");
+    const body = await res.json();
+    const featured = body.data
+      .filter((p: { featured: boolean }) => p.featured)
+      .map((p: { slug: string }) => p.slug)
+      .sort();
+    expect(featured).toEqual(["interviewcopilot", "jarvis-os", "lockin", "rlarena"]);
+  });
+
+  test("LockIn appears on every surface: card, case study, API, manifest", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/");
+    await expect(page.locator("#project-lockin")).toContainText("LockIn");
+
+    await page.goto("/projects/lockin");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("LockIn");
+    await expect(page.getByText("Engineering decisions")).toBeVisible();
+
+    const api = await (await request.get("/api/projects")).json();
+    const lockin = api.data.find((p: { slug: string }) => p.slug === "lockin");
+    expect(lockin).toBeTruthy();
+    expect(lockin.featured).toBe(true);
+    expect(JSON.stringify(lockin)).toContain("128 passing tests across 17 suites");
+
+    const manifest = await (await request.get("/jarvis-site-manifest.json")).text();
+    expect(manifest).toContain("/projects/lockin");
+  });
+
   test("InterviewCopilot uses conservative provider wording and 32/32 count", async ({
     request,
   }) => {

@@ -82,7 +82,8 @@ test.describe("constellation interaction", () => {
   }) => {
     test.skip(!!isMobile, "the constellation map is desktop-only");
     await page.goto("/#systems");
-    const drift = page.locator("[data-drift]").first();
+    // Pin to RLArena's drift group by slug — array order must not matter.
+    const drift = page.locator("[data-drift='rlarena']");
     // The label rides inside the drift group — dot + name move as one unit.
     await expect(drift.getByText("RLArena")).toBeAttached();
     // Ambient wander engages once the section is on screen, and it must be
