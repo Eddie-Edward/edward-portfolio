@@ -13,10 +13,12 @@ import {
   profileSchema,
   projectSchema,
   roadmapItemSchema,
+  sectionsSchema,
   siteConfigSchema,
   skillGroupSchema,
   timelineEntrySchema,
 } from "./schema";
+import { sections } from "./sections";
 import { siteConfig } from "./site-config";
 import { skillGroups } from "./skills";
 import { timeline } from "./timeline";
@@ -69,6 +71,7 @@ export const content = {
     "src/content/coursework.ts",
   ),
   roadmap: parse(z.array(roadmapItemSchema), roadmap, "src/content/roadmap.ts"),
+  sections: parse(sectionsSchema, sections, "src/content/sections.ts"),
   siteConfig: parse(siteConfigSchema, siteConfig, "src/content/site-config.ts"),
 } as const;
 
@@ -106,6 +109,32 @@ export function validateContentIntegrity(): string[] {
   for (const [label, items] of idCollections) {
     if (new Set(items.map((item) => item.id)).size !== items.length) {
       errors.push(`${label}: duplicate ids detected`);
+    }
+  }
+
+  // Constellation legibility: nodes sharing an orbit need ≥25° separation
+  // or their labels collide (docs/jarvis-update-guide.md).
+  const byOrbit = new Map<number, Array<{ slug: string; angle: number }>>();
+  for (const p of content.projects) {
+    if (p.constellation.orbit === 0) continue; // single center node
+    const ring = byOrbit.get(p.constellation.orbit) ?? [];
+    ring.push({ slug: p.slug, angle: p.constellation.angle });
+    byOrbit.set(p.constellation.orbit, ring);
+  }
+  for (const [orbit, ring] of byOrbit) {
+    if (ring.length < 2) continue;
+    const sortedRing = [...ring].sort((a, b) => a.angle - b.angle);
+    for (let i = 0; i < sortedRing.length; i++) {
+      const a = sortedRing[i];
+      const b = sortedRing[(i + 1) % sortedRing.length];
+      // Neighboring gap along the ring; the last pair wraps through 360°.
+      const separation =
+        i === sortedRing.length - 1 ? 360 - (a.angle - b.angle) : b.angle - a.angle;
+      if (separation < 25) {
+        errors.push(
+          `projects: orbit ${orbit} nodes "${a.slug}" and "${b.slug}" are only ${separation}° apart (min 25°)`,
+        );
+      }
     }
   }
 

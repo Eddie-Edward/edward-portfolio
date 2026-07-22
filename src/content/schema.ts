@@ -201,6 +201,29 @@ export const roadmapItemSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Section copy
+// ---------------------------------------------------------------------------
+
+/**
+ * Editorial copy for a homepage section. Lives in src/content/sections.ts so
+ * JARVIS edits headings/ledes as structured content, never component JSX.
+ */
+export const sectionCopySchema = z.object({
+  kicker: z.string().min(1),
+  title: z.string().min(1),
+  lede: z.string().min(1),
+});
+
+export const sectionsSchema = z.object({
+  systems: sectionCopySchema,
+  work: sectionCopySchema,
+  timeline: sectionCopySchema,
+  skills: sectionCopySchema,
+  roadmap: sectionCopySchema,
+  contact: sectionCopySchema,
+});
+
+// ---------------------------------------------------------------------------
 // Site config
 // ---------------------------------------------------------------------------
 
@@ -208,6 +231,11 @@ export const siteConfigSchema = z.object({
   siteName: z.string().min(1),
   tagline: z.string().min(1),
   description: z.string().min(1),
+  /**
+   * Canonical origin for metadata/OG URLs. Currently the Vercel deployment;
+   * switch to the custom domain once Edward purchases one (PR 7).
+   */
+  siteUrl: z.string().url(),
   /** Bump when content meaningfully changes. JARVIS reads this. */
   contentVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   nav: z
@@ -236,4 +264,6 @@ export type SkillGroup = z.infer<typeof skillGroupSchema>;
 export type Achievement = z.infer<typeof achievementSchema>;
 export type Coursework = z.infer<typeof courseworkSchema>;
 export type RoadmapItem = z.infer<typeof roadmapItemSchema>;
+export type SectionCopy = z.infer<typeof sectionCopySchema>;
+export type Sections = z.infer<typeof sectionsSchema>;
 export type SiteConfig = z.infer<typeof siteConfigSchema>;

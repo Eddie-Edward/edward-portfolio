@@ -2,7 +2,9 @@ import type { ProjectStatus } from "@/content/schema";
 import { cn } from "@/lib/utils";
 
 const STATUS_STYLES: Record<ProjectStatus, { dot: string; text: string; label: string }> = {
-  shipped: { dot: "bg-accent", text: "text-accent", label: "Shipped" },
+  // Conservative wording pending Edward's sign-off: the resume says "built"
+  // for the June 2026 platforms, so the `shipped` status renders as "Built".
+  shipped: { dot: "bg-accent", text: "text-accent", label: "Built" },
   active: { dot: "bg-signal", text: "text-signal", label: "Active" },
   "in-progress": { dot: "bg-nebula-bright", text: "text-nebula-bright", label: "In progress" },
   research: { dot: "bg-dim", text: "text-dim", label: "Research" },

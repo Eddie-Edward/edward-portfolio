@@ -18,10 +18,15 @@ test.describe("home page", () => {
   test("renders project cards from the content layer", async ({ page }) => {
     await page.goto("/");
     const cards = page.locator("[id^='project-']");
-    expect(await cards.count()).toBeGreaterThanOrEqual(8);
+    // Default lens is Featured — the four resume-aligned systems.
+    await expect.poll(() => cards.count()).toBe(4);
     await expect(page.locator("#project-rlarena")).toContainText("RLArena");
-    await expect(page.locator("#project-prsense")).toContainText("PRSense");
+    await expect(page.locator("#project-lockin")).toContainText("LockIn");
     await expect(page.locator("#project-interviewcopilot")).toContainText("InterviewCopilot");
+    // Everything else is one click away under All.
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
+    await expect(page.locator("#project-prsense")).toContainText("PRSense");
   });
 
   test("case study page renders from content", async ({ page }) => {
@@ -42,30 +47,41 @@ test.describe("selected work browsing", () => {
     await page.goto("/");
     await page.locator("#work").scrollIntoViewIfNeeded();
     const cards = page.locator("[id^='project-']");
+    // Leave the Featured default so the full grid is the reference set.
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
     const allCount = await cards.count();
-    expect(allCount).toBeGreaterThanOrEqual(8);
 
-    await page.getByRole("button", { name: /^Shipped/ }).click();
+    await page.getByRole("button", { name: /^Built/ }).click();
     await expect.poll(() => cards.count()).toBeLessThan(allCount);
-    // Every remaining card must actually be shipped.
+    // Every remaining card must actually carry the built (shipped) status.
     for (const text of await cards.allTextContents()) {
-      expect(text).toContain("Shipped");
+      expect(text).toContain("Built");
     }
 
     await page.getByRole("button", { name: /^All/ }).click();
     await expect.poll(() => cards.count()).toBe(allCount);
   });
 
+  test("direct load of a non-featured project anchor reveals its card", async ({ page }) => {
+    // A shared/bookmarked URL never fires hashchange — the mount-time
+    // reconcile must reset the Featured default so the target card exists.
+    await page.goto("/#project-prsense");
+    await expect(page.locator("#project-prsense")).toBeVisible();
+  });
+
   test("filter chips are keyboard operable with toggle semantics", async ({ page }) => {
     await page.goto("/");
     await page.locator("#work").scrollIntoViewIfNeeded();
     const cards = page.locator("[id^='project-']");
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
     const allCount = await cards.count();
 
-    const featured = page.getByRole("button", { name: /^Featured/ });
-    await featured.focus();
+    const shipped = page.getByRole("button", { name: /^Built/ });
+    await shipped.focus();
     await page.keyboard.press("Enter");
-    await expect(featured).toHaveAttribute("aria-current", "true");
+    await expect(shipped).toHaveAttribute("aria-current", "true");
     await expect.poll(() => cards.count()).toBeLessThan(allCount);
     await expect.poll(() => cards.count()).toBeGreaterThan(0);
 
@@ -82,7 +98,8 @@ test.describe("constellation interaction", () => {
   }) => {
     test.skip(!!isMobile, "the constellation map is desktop-only");
     await page.goto("/#systems");
-    const drift = page.locator("[data-drift]").first();
+    // Pin to RLArena's drift group by slug — array order must not matter.
+    const drift = page.locator("[data-drift='rlarena']");
     // The label rides inside the drift group — dot + name move as one unit.
     await expect(drift.getByText("RLArena")).toBeAttached();
     // Ambient wander engages once the section is on screen, and it must be
@@ -143,6 +160,49 @@ test.describe("constellation interaction", () => {
     );
     expect(after).toBe(before);
     expect(lineAfter).toBe(lineBefore);
+  });
+
+  test("selecting a node brightens its edges and fades unrelated ones", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!!isMobile, "the constellation map is desktop-only");
+    await page.goto("/#systems");
+    // Focus freezes the drifting node, then Enter selects it — clicking a
+    // moving target is flaky by design (drift pauses only on hover/focus).
+    const node = page.getByRole("button", { name: /RLArena/ });
+    await node.focus();
+    await page.keyboard.press("Enter");
+
+    // Edge touching the selected node carries full opacity …
+    const connected = page
+      .locator("[data-conn-line][data-from='rlarena'], [data-conn-line][data-to='rlarena']")
+      .first();
+    await expect(connected).toHaveAttribute("opacity", "1");
+    // … while an edge touching neither endpoint recedes.
+    const unrelated = page
+      .locator("[data-conn-line][data-from='contentos'], [data-conn-line][data-to='contentos']")
+      .first();
+    await expect(unrelated).toHaveAttribute("opacity", "0.3");
+
+    // The detail panel shows role and up to three evidence bullets.
+    const panel = page.getByRole("region", { name: "Selected system details" });
+    await expect(panel).toContainText("Creator & Developer");
+    await expect(panel).toContainText("DQN and Double DQN");
+  });
+
+  test("mobile node list shows featured systems first", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "the node list is the mobile fallback");
+    await page.goto("/#systems");
+    const hrefs = await page
+      .locator("#systems a[href^='#project-']")
+      .evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+    expect(hrefs.slice(0, 4)).toEqual([
+      "#project-jarvis-os",
+      "#project-lockin",
+      "#project-interviewcopilot",
+      "#project-rlarena",
+    ]);
   });
 
   test("reduced motion keeps nodes and lines fully static", async ({ page, isMobile }) => {
@@ -211,7 +271,7 @@ test.describe("accessibility", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Edward Lei");
     await page.locator("#skills").scrollIntoViewIfNeeded();
-    await expect(page.getByText("The stack behind the systems.")).toBeVisible();
+    await expect(page.getByText("Tools grouped by the work they support.")).toBeVisible();
   });
 
   test("keyboard: skip link appears first and nav is focusable", async ({ page, isMobile }) => {

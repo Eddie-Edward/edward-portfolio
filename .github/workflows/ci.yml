@@ -1,0 +1,43 @@
+# Recruiter-delivery CI: every gate the local workflow requires, in order.
+# The committed manifest doubles as the drift gate — content:check fails if
+# public/jarvis-site-manifest.json no longer matches src/content.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install (frozen)
+        run: pnpm install --frozen-lockfile
+
+      - name: Content schemas, integrity, safety scan, manifest drift
+        run: pnpm content:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests (visual snapshots are local-only)
+        run: pnpm test:e2e

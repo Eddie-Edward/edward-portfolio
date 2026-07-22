@@ -13,13 +13,17 @@ import type { Project } from "./schema";
  * - `source: "local"`  — verified against a repo on Edward's machine.
  * - `source: "todo"`   — placeholder; the UI shows these conservatively and
  *   the `todo` field says what Edward still needs to confirm.
+ *
+ * Featured set (matches the current resume): JARVIS, LockIn,
+ * InterviewCopilot, RLArena. Constellation slots on the same orbit keep
+ * ≥25° separation (enforced by validateContentIntegrity).
  */
 export const projects: Project[] = [
-  // ── Center: the orchestrator ─────────────────────────────────────────────
+  // ── Center: the control plane ────────────────────────────────────────────
   {
     slug: "jarvis-os",
     name: "JARVIS OS",
-    tagline: "A personal AI operating system",
+    tagline: "Personal AI companion and engineering control plane",
     category: "ai-systems",
     status: "active",
     featured: true,
@@ -27,35 +31,128 @@ export const projects: Project[] = [
     period: "2026 — Present",
     role: "Creator & Developer",
     summary:
-      "A desktop AI system that acts as Edward's personal operating layer — orchestrating agents, projects, and tools from one place. JARVIS is being built to maintain the rest of Edward's software, including this site, which exposes a structured content contract JARVIS can update safely.",
+      "A Windows-first desktop AI system that unifies conversation, voice, approved memory, action proposals, and engineering-session orchestration behind one local control plane. The project remains private and in active development.",
     highlights: [
-      "Desktop application under active development in a private repository.",
-      "Designed to orchestrate Edward's other systems — this portfolio ships a JARVIS compatibility layer (structured content, read-only API, machine-readable manifest).",
+      "5,800+ automated tests green across more than 180 logged development iterations at the last verified checkpoint.",
+      "OpenAI Realtime streaming voice uses server-minted ephemeral credentials so permanent API keys do not reach the client.",
+      "Press-to-interrupt, approval-gated local actions behind an Emergency Stop, and a mock two-project engineering-fleet pilot are implemented.",
     ],
-    stack: ["TypeScript", "Electron", "AI agents", "Claude API"],
+    stack: ["TypeScript", "OpenAI Realtime", "AI agents", "packaged desktop runtime"],
     links: [],
     connections: ["edward-portfolio", "careeros", "contentos", "rlarena"],
     constellation: { orbit: 0, angle: 0, size: "lg" },
     caseStudy: {
       problem:
-        "Personal software sprawls: projects, notes, automations, and agents end up scattered across tools that don't talk to each other. Edward wanted one operating layer — a system that knows about his projects and can act on them.",
+        "Edward's projects, assistants, and automation workflows were split across separate tools with no shared conversation, approval, or engineering-control layer.",
       built: [
-        "A desktop AI application (private repo) that serves as the command center for Edward's projects and agents.",
-        "A compatibility contract with this portfolio: structured content files, Zod validation, a read-only API, and a site manifest JARVIS can read to plan updates.",
+        "A Windows-first desktop companion with unified text and voice conversations, approved memory, project status, and local action proposals.",
+        "OpenAI Realtime streaming voice with server-minted ephemeral credentials; permanent API keys remain server-side.",
+        "An approval-gated action path with Emergency Stop, press-to-interrupt, and a mock two-project engineering-fleet pilot.",
       ],
       engineering: [
-        "Agent orchestration around the Claude API.",
-        "Update safety by design: JARVIS edits typed content files and runs schema validation — it never scrapes or rewrites rendered HTML.",
+        "5,800+ automated tests green across more than 180 logged development iterations at the last verified checkpoint.",
+        "Typecheck, lint, security scan, build, desktop-build, and desktop-package gates were required before local merge.",
+        "A live acceptance run measured approximately 557 ms to first audio.",
       ],
       outcome:
-        "In active development. This site is the first external system built JARVIS-compatible from day one.",
+        "In active development. Unified conversation and the OpenAI Realtime foundation are working; wake word, acoustic barge-in, and trusted cross-device use remain incomplete.",
       future:
-        "Bind this repo through JARVIS Trusted Projects so JARVIS can draft, validate, and propose portfolio updates automatically.",
+        "Complete physical audio acceptance and keep JARVIS focused on personal context, approvals, and orchestration while CareerOS and other systems retain their domain logic.",
     },
-    todo: "TODO(Edward): confirm the public one-line description of JARVIS and add a link if/when any part becomes public.",
   },
 
-  // ── Orbit 1: shipped, resume-verified platforms ──────────────────────────
+  // ── Orbit 1: the four featured resume projects ───────────────────────────
+  {
+    slug: "lockin",
+    name: "LockIn",
+    tagline: "Native iOS behavior-enforcement system",
+    category: "platform",
+    status: "active",
+    featured: true,
+    source: "local",
+    period: "Jul 2026 — Present",
+    role: "Creator & Developer",
+    summary:
+      "A native iOS behavior-enforcement app for alarms and morning missions. Its portable Swift 6 domain core is working on Windows; Apple-framework integration and physical-device acceptance remain in progress.",
+    highlights: [
+      "Swift 6 strict-concurrency core with an actor-based mission state machine and idempotent completion under races.",
+      "Deterministic DST-safe alarm scheduling and reconciliation.",
+      "Versioned HMAC-SHA256 QR verification with constant-time comparison and key rotation; 128 passing tests across 17 suites.",
+    ],
+    stack: ["Swift 6", "SwiftPM", "Strict concurrency", "Actors", "HMAC-SHA256"],
+    links: [],
+    connections: ["jarvis-os"],
+    constellation: { orbit: 1, angle: 20, size: "lg" },
+    caseStudy: {
+      problem:
+        "Alarm apps can schedule notifications, but they do not reliably enforce a multi-step morning mission across time changes, duplicate events, and reconstruction.",
+      built: [
+        "A portable Swift package containing alarm planning, reconciliation, mission-state, QR-verification, and step-fallback domain logic.",
+        "An actor-based mission coordinator with idempotent completion under duplicate, simultaneous, expiry, and reconstruction races.",
+        "Versioned HMAC-SHA256 QR enrollment and verification with constant-time comparison and key rotation.",
+      ],
+      engineering: [
+        "Strict Swift concurrency, protocol-driven adapters, an injected clock, and pure planners keep the domain testable on Windows and portable to iOS.",
+        "Alarm reconciliation retains valid owned alarms, repairs missing alarms, cancels stale owned alarms, and cannot target foreign alarms.",
+        "128 tests pass across 17 suites, with debug and release builds green at the last verified checkpoint.",
+      ],
+      outcome:
+        "The portable M1A domain core works on Windows. Native SwiftUI, AlarmKit, Apple persistence, and physical-device acceptance are not complete.",
+      future:
+        "Complete M1B in Xcode on macOS while preserving the validated portable core and milestone order.",
+    },
+  },
+  {
+    slug: "interviewcopilot",
+    name: "InterviewCopilot",
+    tagline: "Provider-pluggable interview preparation",
+    category: "platform",
+    status: "shipped",
+    featured: true,
+    source: "resume",
+    period: "Jun 2026",
+    role: "Creator & Developer",
+    summary:
+      "A full-stack AI interview platform that simulates SWE, AI/ML, data-science, and behavioral interviews — adaptive follow-ups, knowledge-gap tracking, and structured feedback reports paired with study plans.",
+    highlights: [
+      "Provider-pluggable interview and evaluation services with deterministic local defaults and environment-gated external-provider stubs.",
+      "Adaptive follow-ups, knowledge-gap tracking, and structured feedback with study plans.",
+      "32/32 backend tests passed at the last directly verified checkpoint.",
+    ],
+    stack: [
+      "React",
+      "TypeScript",
+      "FastAPI",
+      "PostgreSQL",
+      "Redis/RQ",
+      "WebSockets",
+      "Docker",
+      "Provider interfaces",
+    ],
+    // Public repository link removed 2026-07-21: the previous GitHub URL
+    // returned 404. Restore only with a working URL from Edward.
+    links: [],
+    connections: ["rlarena", "careeros"],
+    constellation: { orbit: 1, angle: 110, size: "lg" },
+    caseStudy: {
+      problem:
+        "Interview prep tools are mostly static question banks. Real interviews adapt to your answers. Edward built an interviewer that does the same — and tells you exactly where your knowledge gaps are.",
+      built: [
+        "A full-stack platform simulating SWE, AI/ML, data-science, and behavioral interviews over WebSockets.",
+        "Provider-pluggable interview and evaluation services with deterministic local defaults and environment-gated external-provider stubs.",
+        "Adaptive follow-up questioning, knowledge-gap tracking, and structured feedback reports paired with study plans.",
+      ],
+      engineering: [
+        "Pydantic JSON validation on every LLM response — malformed model output never reaches the UI.",
+        "Retry handling and environment-based secret management.",
+        "32/32 backend tests passed at the last directly verified checkpoint.",
+      ],
+      outcome:
+        "Working local MVP at the last verified checkpoint. Public repository link pending correction.",
+      future:
+        "Feed interview performance into CareerOS so prep, applications, and feedback share one loop.",
+    },
+  },
   {
     slug: "rlarena",
     name: "RLArena",
@@ -91,7 +188,7 @@ export const projects: Project[] = [
       },
     ],
     connections: ["prsense", "interviewcopilot"],
-    constellation: { orbit: 1, angle: 20, size: "lg" },
+    constellation: { orbit: 1, angle: 200, size: "lg" },
     caseStudy: {
       problem:
         "RL experiments are usually invisible while they run — you launch a training job, wait, and inspect artifacts afterward. Edward wanted training you can watch: live metrics, live frames, and honest comparisons between runs.",
@@ -106,10 +203,61 @@ export const projects: Project[] = [
         "Dockerized services across frontend, API, workers, and database.",
       ],
       outcome:
-        "Shipped and public on GitHub. Trains, replays, compares, and ranks Snake agents in real time.",
+        "Built and public on GitHub. Trains, replays, compares, and ranks Snake agents in real time.",
       future:
         "More environments and algorithms, and richer benchmark suites against stronger baselines.",
     },
+  },
+
+  // ── Orbit 2: shipped case studies + systems in progress ──────────────────
+  {
+    slug: "careeros",
+    name: "CareerOS",
+    tagline: "Application preparation and tracking system",
+    category: "automation",
+    status: "active",
+    featured: false,
+    // Verified 2026-07-21 against the local repo (C:\Users\edwar\Projects\
+    // careerOS): provenance-first job records, human final-Submit boundary,
+    // and the historical 422/422 checkpoint in docs/current-phase-15-plan.md.
+    source: "local",
+    period: "2026 — Present",
+    role: "Creator & Developer",
+    summary:
+      "A provenance-first career workflow for capturing job postings, tailoring one-page application materials from approved facts, reviewing them for ATS, recruiter, and factual risk, and stopping at a final human Submit boundary.",
+    highlights: [
+      "Job records preserve source evidence, normalized requirements, and unresolved fields.",
+      "Resume and cover-letter workflows are designed around an approved candidate-fact source rather than invented claims.",
+      "Historical repository checkpoint: 422/422 tests passing; the current repository must be reverified before stronger public claims.",
+    ],
+    stack: ["TypeScript", "AI agents"],
+    links: [],
+    connections: ["interviewcopilot", "jarvis-os"],
+    constellation: { orbit: 2, angle: 35, size: "md" },
+    todo: "Current public copy is intentionally limited to verified architecture and the historical test checkpoint.",
+  },
+  {
+    slug: "contentos",
+    name: "contentOS",
+    tagline: "Multi-agent content operations system",
+    category: "automation",
+    status: "active",
+    featured: false,
+    source: "local",
+    period: "2025 — Present",
+    role: "Creator & Developer",
+    summary:
+      "A TypeScript monorepo for planning, reviewing, and tracking content work through specialized agent roles, a shared orchestrator, Prisma/PostgreSQL persistence, and queue-backed workers.",
+    highlights: [
+      "Specialist roles cover strategy, briefs, compliance, QA, growth analysis, and memory.",
+      "Next.js, Prisma/PostgreSQL, and worker packages are separated inside the monorepo.",
+      "FrameZero and Agent Ops Daily remain operating experiments within contentOS rather than separate portfolio projects.",
+    ],
+    stack: ["TypeScript", "Next.js", "Prisma", "PostgreSQL", "AI agents"],
+    links: [],
+    connections: ["jarvis-os"],
+    constellation: { orbit: 2, angle: 125, size: "md" },
+    todo: "TODO(Edward): confirm public description and add a link if the repo becomes public.",
   },
   {
     slug: "prsense",
@@ -117,7 +265,7 @@ export const projects: Project[] = [
     tagline: "Repo-aware AI code review",
     category: "devtool",
     status: "shipped",
-    featured: true,
+    featured: false,
     source: "resume",
     period: "Jun 2026",
     role: "Creator & Developer",
@@ -144,7 +292,7 @@ export const projects: Project[] = [
       },
     ],
     connections: ["rlarena"],
-    constellation: { orbit: 1, angle: 140, size: "lg" },
+    constellation: { orbit: 2, angle: 215, size: "md" },
     caseStudy: {
       problem:
         "AI code review tools often hallucinate confident nonsense because they only see the diff. Edward built a reviewer that retrieves repo context first and explains every finding it makes.",
@@ -159,145 +307,10 @@ export const projects: Project[] = [
         "Feedback loop: accept/dismiss decisions feed precision analytics per finding category.",
       ],
       outcome:
-        "Shipped and public on GitHub. Validated on a real diff from RLArena, surfacing security, maintainability, and testing issues.",
+        "Built and public on GitHub. Validated on a real diff from RLArena, surfacing security, maintainability, and testing issues.",
       future:
         "Broader provider support and tighter integration into PR workflows.",
     },
-  },
-  {
-    slug: "interviewcopilot",
-    name: "InterviewCopilot",
-    tagline: "Claude-powered interview training",
-    category: "platform",
-    status: "shipped",
-    featured: true,
-    source: "resume",
-    period: "Jun 2026",
-    role: "Creator & Developer",
-    summary:
-      "A full-stack AI interview platform that simulates SWE, AI/ML, data-science, and behavioral interviews — adaptive follow-ups, knowledge-gap tracking, and structured feedback reports paired with study plans.",
-    highlights: [
-      "Provider-pluggable LLM services with local fallback.",
-      "Adaptive follow-ups, knowledge-gap tracking, and structured feedback with study plans.",
-      "72 passing tests across Dockerized services.",
-    ],
-    stack: [
-      "React",
-      "TypeScript",
-      "FastAPI",
-      "PostgreSQL",
-      "Redis/RQ",
-      "WebSockets",
-      "Docker",
-      "Claude API",
-    ],
-    links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/Eddie-Edward/interviewcopilot",
-        kind: "github",
-      },
-    ],
-    connections: ["rlarena", "careeros"],
-    constellation: { orbit: 1, angle: 260, size: "lg" },
-    caseStudy: {
-      problem:
-        "Interview prep tools are mostly static question banks. Real interviews adapt to your answers. Edward built an interviewer that does the same — and tells you exactly where your knowledge gaps are.",
-      built: [
-        "A full-stack platform simulating SWE, AI/ML, data-science, and behavioral interviews over WebSockets.",
-        "Provider-pluggable LLM services around the Claude API, with a local fallback provider.",
-        "Adaptive follow-up questioning, knowledge-gap tracking, and structured feedback reports paired with study plans.",
-      ],
-      engineering: [
-        "Pydantic JSON validation on every LLM response — malformed model output never reaches the UI.",
-        "Retry handling and environment-based secret management.",
-        "72 passing tests across Dockerized services.",
-      ],
-      outcome: "Shipped and public on GitHub.",
-      future:
-        "Feed interview performance into CareerOS so prep, applications, and feedback share one loop.",
-    },
-  },
-
-  // ── Orbit 2: systems in progress ─────────────────────────────────────────
-  {
-    slug: "careeros",
-    name: "CareerOS",
-    tagline: "Job-search automation system",
-    category: "automation",
-    status: "in-progress",
-    featured: false,
-    source: "todo",
-    period: "2026",
-    role: "Creator & Developer",
-    summary:
-      "An automation layer for the job search — tracking postings, tailoring materials, and connecting interview prep into one pipeline. Early build.",
-    highlights: [],
-    stack: ["TypeScript", "AI agents"],
-    links: [],
-    connections: ["interviewcopilot", "jarvis-os"],
-    constellation: { orbit: 2, angle: 60, size: "md" },
-    todo: "TODO(Edward): confirm CareerOS scope, status, and stack — details here are intentionally minimal until then.",
-  },
-  {
-    slug: "contentos",
-    name: "contentOS",
-    tagline: "Multi-agent content pipeline",
-    category: "automation",
-    status: "in-progress",
-    featured: false,
-    source: "local",
-    period: "2025 — Present",
-    role: "Creator & Developer",
-    summary:
-      "A multi-agent content system: strategist, brief-writer, compliance and QA reviewer agents coordinated by an orchestrator, with a Prisma-backed data layer and a worker queue. In development in a local monorepo.",
-    highlights: [
-      "Agent roles (niche strategist, brief writer, compliance reviewer, QA reviewer, growth analyst, memory writer) coordinated by an orchestrator.",
-      "TypeScript monorepo with a Next.js app, Prisma/PostgreSQL data layer, and queue-backed workers.",
-    ],
-    stack: ["TypeScript", "Next.js", "Prisma", "PostgreSQL", "AI agents"],
-    links: [],
-    connections: ["framezero", "agent-ops-daily", "jarvis-os"],
-    constellation: { orbit: 2, angle: 130, size: "md" },
-    todo: "TODO(Edward): confirm public description and add a link if the repo becomes public.",
-  },
-  {
-    slug: "framezero",
-    name: "FrameZero",
-    tagline: "Content automation project",
-    category: "automation",
-    status: "in-progress",
-    featured: false,
-    source: "todo",
-    period: "2026",
-    role: "Creator & Developer",
-    summary:
-      "A content automation project in Edward's agent-systems family. Details coming soon.",
-    highlights: [],
-    stack: ["TypeScript", "AI agents"],
-    links: [],
-    connections: ["contentos"],
-    constellation: { orbit: 2, angle: 200, size: "sm" },
-    todo: "TODO(Edward): describe FrameZero (scope, status, stack) — placeholder entry.",
-  },
-  {
-    slug: "agent-ops-daily",
-    name: "Agent Ops Daily",
-    tagline: "Agent-operations publication project",
-    category: "automation",
-    status: "in-progress",
-    featured: false,
-    source: "todo",
-    period: "2026",
-    role: "Creator & Developer",
-    summary:
-      "A recurring publication/automation project about operating AI agents in practice. Details coming soon.",
-    highlights: [],
-    stack: ["AI agents"],
-    links: [],
-    connections: ["contentos"],
-    constellation: { orbit: 2, angle: 270, size: "sm" },
-    todo: "TODO(Edward): describe Agent Ops Daily (format, cadence, status) — placeholder entry.",
   },
   {
     slug: "trading-research",
@@ -315,7 +328,7 @@ export const projects: Project[] = [
     stack: ["Python", "pandas"],
     links: [],
     connections: ["rlarena"],
-    constellation: { orbit: 2, angle: 335, size: "sm" },
+    constellation: { orbit: 2, angle: 305, size: "sm" },
     todo: "TODO(Edward): confirm what, if anything, should be said publicly about this system.",
   },
 
@@ -373,6 +386,6 @@ export const projects: Project[] = [
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "Motion", "GSAP", "Zod"],
     links: [],
     connections: ["jarvis-os"],
-    constellation: { orbit: 3, angle: 250, size: "sm" },
+    constellation: { orbit: 3, angle: 260, size: "sm" },
   },
 ];

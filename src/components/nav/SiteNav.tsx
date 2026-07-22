@@ -12,6 +12,9 @@ export function SiteNav() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.4 });
   const github = content.links.find((l) => l.kind === "github");
+  // Utility action: appears automatically once links.ts points at a real
+  // hosted PDF (until then the placeholder href "#" keeps it hidden).
+  const resume = content.links.find((l) => l.kind === "resume" && l.href !== "#");
 
   return (
     <motion.header
@@ -52,6 +55,16 @@ export function SiteNav() {
                   {item.label}
                 </a>
               ))}
+              {resume ? (
+                <a
+                  href={resume.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap text-accent transition-colors hover:border-accent/60 sm:py-1.5"
+                >
+                  Resume ↗
+                </a>
+              ) : null}
               {github ? (
                 <a
                   href={github.href}

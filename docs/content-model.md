@@ -17,8 +17,15 @@ in `src/content/schema.ts`. **If it isn't in a content file, the site doesn't sa
 | `coursework.ts` | `coursework` | Selected coursework chips. |
 | `roadmap.ts` | `roadmap` | Now / next / later directions. |
 | `links.ts` | `links` | Public profile links (GitHub, LinkedIn, email, resume). |
-| `site-config.ts` | `siteConfig` | Site name, description, nav, `contentVersion`, JARVIS contract info. |
+| `sections.ts` | `sections` | Homepage section headings/ledes (work, timeline, systems, skills, roadmap, contact) — editorial copy as structured content, not component JSX. |
+| `site-config.ts` | `siteConfig` | Site name, description, nav, `siteUrl`, `contentVersion`, JARVIS contract info. |
 | `index.ts` | `content`, helpers | Validated aggregate + integrity checks. Do not bypass it. |
+
+`siteConfig.siteUrl` (schema: `z.string().url()`) is the canonical origin used for
+`metadataBase`, canonical links, and Open Graph/Twitter metadata in `src/app/layout.tsx`,
+and for the build-time OG image at `src/app/opengraph-image.tsx`. It currently points at
+the Vercel URL (`https://edward-portfolio-five.vercel.app`) and should move to the custom
+domain once one exists.
 
 ## The `source` field
 

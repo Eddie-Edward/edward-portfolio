@@ -25,6 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(content.siteConfig.siteUrl),
   title: {
     default: `${content.profile.name} — ${content.profile.headline}`,
     template: `%s · ${content.profile.name}`,
@@ -37,6 +38,19 @@ export const metadata: Metadata = {
     "University of Michigan",
     "portfolio",
   ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: content.siteConfig.siteName,
+    title: `${content.profile.name} — ${content.profile.headline}`,
+    description: content.siteConfig.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${content.profile.name} — ${content.profile.headline}`,
+    description: content.siteConfig.description,
+  },
 };
 
 export default function RootLayout({

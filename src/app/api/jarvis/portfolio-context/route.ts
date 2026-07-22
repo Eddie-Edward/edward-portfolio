@@ -22,6 +22,7 @@ export function GET() {
       achievements: content.achievements,
       coursework: content.coursework,
       roadmap: content.roadmap,
+      sections: content.sections,
       siteConfig: content.siteConfig,
     },
     agentGuidance: {

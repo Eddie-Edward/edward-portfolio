@@ -46,7 +46,7 @@ const AI_SIGNAL = /\bai\b|llm|claude|pytorch|agent|reinforcement/i;
 const FILTERS: FilterDef[] = [
   { id: "all", label: "All", match: () => true },
   { id: "featured", label: "Featured", match: (p) => p.featured },
-  { id: "shipped", label: "Shipped", match: (p) => p.status === "shipped" },
+  { id: "shipped", label: "Built", match: (p) => p.status === "shipped" },
   {
     id: "active",
     label: "Active",
@@ -77,7 +77,9 @@ const FILTERS: FilterDef[] = [
 
 export function WorkBrowser() {
   const projects = content.projects;
-  const [activeFilter, setActiveFilter] = useState("all");
+  // Recruiters land on the four resume-aligned featured systems; everything
+  // else stays one "All" click away.
+  const [activeFilter, setActiveFilter] = useState("featured");
 
   const counts = useMemo(
     () => new Map(FILTERS.map((f) => [f.id, projects.filter(f.match).length])),
@@ -94,11 +96,19 @@ export function WorkBrowser() {
     const revealAnchorTarget = () => {
       const hash = window.location.hash;
       if (!hash.startsWith("#project-")) return;
+      // Already rendered under the current lens (e.g. a featured card on
+      // initial load)? Leave the filter alone — resetting would reflow the
+      // grid out from under the browser's native fragment scroll.
+      if (document.getElementById(hash.slice(1))) return;
       setActiveFilter("all");
       window.setTimeout(() => {
         document.getElementById(hash.slice(1))?.scrollIntoView();
       }, 80);
     };
+    // Also reconcile on mount: a direct load of /#project-<slug> never fires
+    // hashchange, and the Featured default would leave non-featured anchor
+    // targets out of the DOM entirely.
+    revealAnchorTarget();
     window.addEventListener("hashchange", revealAnchorTarget);
     return () => window.removeEventListener("hashchange", revealAnchorTarget);
   }, []);

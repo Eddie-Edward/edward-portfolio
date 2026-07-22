@@ -8,7 +8,10 @@ export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  // One retry everywhere: full-page visual snapshots contend with API tests
+  // on the single dev server and can surface transient ECONNRESETs. Real
+  // failures still fail; genuine flakes get reported as "flaky".
+  retries: 1,
   reporter: [["list"]],
   timeout: 60_000,
   use: {
