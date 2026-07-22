@@ -9,7 +9,7 @@ export const siteConfig: SiteConfig = {
   tagline: "AI systems builder · engineering student",
   description:
     "Edward Lei builds AI systems end to end — agents, platforms, and developer tools. CS Engineering at the University of Michigan.",
-  contentVersion: "1.2.0",
+  contentVersion: "1.3.0",
   // Root-relative so the nav works from case-study pages too, not just "/".
   nav: [
     { label: "Systems", href: "/#systems" },

@@ -77,7 +77,9 @@ const FILTERS: FilterDef[] = [
 
 export function WorkBrowser() {
   const projects = content.projects;
-  const [activeFilter, setActiveFilter] = useState("all");
+  // Recruiters land on the four resume-aligned featured systems; everything
+  // else stays one "All" click away.
+  const [activeFilter, setActiveFilter] = useState("featured");
 
   const counts = useMemo(
     () => new Map(FILTERS.map((f) => [f.id, projects.filter(f.match).length])),

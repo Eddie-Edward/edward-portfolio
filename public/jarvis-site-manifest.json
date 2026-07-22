@@ -2,7 +2,7 @@
   "site": "Edward Lei",
   "tagline": "AI systems builder · engineering student",
   "contractVersion": "1.0.0",
-  "contentVersion": "1.2.0",
+  "contentVersion": "1.3.0",
   "updateGuide": "docs/jarvis-update-guide.md",
   "contentModel": "docs/content-model.md",
   "contract": "docs/jarvis-portfolio-contract.md",
@@ -100,7 +100,7 @@
     }
   ],
   "counts": {
-    "projects": 12,
+    "projects": 10,
     "caseStudies": 5,
     "timelineEntries": 8,
     "skillGroups": 6,
@@ -114,5 +114,5 @@
     "Never add phone numbers, street addresses, or secrets to content files.",
     "Do not scrape rendered HTML — consume /api/jarvis/portfolio-context instead."
   ],
-  "generatedAt": "2026-07-22T02:07:44.686Z"
+  "generatedAt": "2026-07-22T02:12:09.658Z"
 }

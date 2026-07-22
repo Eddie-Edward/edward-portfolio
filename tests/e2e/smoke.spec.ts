@@ -18,10 +18,15 @@ test.describe("home page", () => {
   test("renders project cards from the content layer", async ({ page }) => {
     await page.goto("/");
     const cards = page.locator("[id^='project-']");
-    expect(await cards.count()).toBeGreaterThanOrEqual(8);
+    // Default lens is Featured — the four resume-aligned systems.
+    await expect.poll(() => cards.count()).toBe(4);
     await expect(page.locator("#project-rlarena")).toContainText("RLArena");
-    await expect(page.locator("#project-prsense")).toContainText("PRSense");
+    await expect(page.locator("#project-lockin")).toContainText("LockIn");
     await expect(page.locator("#project-interviewcopilot")).toContainText("InterviewCopilot");
+    // Everything else is one click away under All.
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
+    await expect(page.locator("#project-prsense")).toContainText("PRSense");
   });
 
   test("case study page renders from content", async ({ page }) => {
@@ -42,8 +47,10 @@ test.describe("selected work browsing", () => {
     await page.goto("/");
     await page.locator("#work").scrollIntoViewIfNeeded();
     const cards = page.locator("[id^='project-']");
+    // Leave the Featured default so the full grid is the reference set.
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
     const allCount = await cards.count();
-    expect(allCount).toBeGreaterThanOrEqual(8);
 
     await page.getByRole("button", { name: /^Shipped/ }).click();
     await expect.poll(() => cards.count()).toBeLessThan(allCount);
@@ -60,12 +67,14 @@ test.describe("selected work browsing", () => {
     await page.goto("/");
     await page.locator("#work").scrollIntoViewIfNeeded();
     const cards = page.locator("[id^='project-']");
+    await page.getByRole("button", { name: /^All/ }).click();
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(9);
     const allCount = await cards.count();
 
-    const featured = page.getByRole("button", { name: /^Featured/ });
-    await featured.focus();
+    const shipped = page.getByRole("button", { name: /^Shipped/ });
+    await shipped.focus();
     await page.keyboard.press("Enter");
-    await expect(featured).toHaveAttribute("aria-current", "true");
+    await expect(shipped).toHaveAttribute("aria-current", "true");
     await expect.poll(() => cards.count()).toBeLessThan(allCount);
     await expect.poll(() => cards.count()).toBeGreaterThan(0);
 

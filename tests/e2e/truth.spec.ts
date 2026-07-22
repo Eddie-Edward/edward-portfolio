@@ -88,6 +88,24 @@ test.describe("truth alignment", () => {
     expect(manifest).toContain("/projects/lockin");
   });
 
+  test("preview clutter stays controlled", async ({ request }) => {
+    const body = await (await request.get("/api/projects")).json();
+    const previews = body.data.filter((p: { source: string }) => p.source === "todo");
+    expect(previews.length).toBeLessThanOrEqual(2);
+    const slugs = body.data.map((p: { slug: string }) => p.slug);
+    expect(slugs).not.toContain("framezero");
+    expect(slugs).not.toContain("agent-ops-daily");
+  });
+
+  test("Selected Work defaults to the featured lens", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: /^Featured/ })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    await expect.poll(() => page.locator("[id^='project-']").count()).toBe(4);
+  });
+
   test("InterviewCopilot uses conservative provider wording and 32/32 count", async ({
     request,
   }) => {

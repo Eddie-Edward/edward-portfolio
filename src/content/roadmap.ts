@@ -40,9 +40,9 @@ export const roadmap: RoadmapItem[] = [
   },
   {
     id: "content-systems",
-    title: "Content automation systems",
+    title: "Content operations system",
     description:
-      "contentOS, FrameZero, and Agent Ops Daily: multi-agent pipelines that research, draft, review, and publish content with humans in the loop.",
+      "Continue contentOS as the shared system for research, planning, review, scheduling, and measurement. FrameZero and Agent Ops Daily remain experiments within that system.",
     horizon: "later",
     source: "todo",
   },
