@@ -9,12 +9,14 @@ export const siteConfig: SiteConfig = {
   tagline: "AI systems builder · engineering student",
   description:
     "Edward Lei builds AI systems end to end — agents, platforms, and developer tools. CS Engineering at the University of Michigan.",
-  contentVersion: "1.3.0",
+  contentVersion: "1.4.0",
   // Root-relative so the nav works from case-study pages too, not just "/".
+  // Order mirrors the page's reading order: featured work and evidence
+  // first, the systems map second.
   nav: [
-    { label: "Systems", href: "/#systems" },
     { label: "Work", href: "/#work" },
     { label: "Timeline", href: "/#timeline" },
+    { label: "Systems", href: "/#systems" },
     { label: "Skills", href: "/#skills" },
     { label: "Roadmap", href: "/#roadmap" },
     { label: "Contact", href: "/#contact" },

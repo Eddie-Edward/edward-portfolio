@@ -18,6 +18,9 @@ export function Hero() {
   const { profile, links } = content;
   const github = links.find((l) => l.kind === "github");
   const email = links.find((l) => l.kind === "email");
+  // The resume link stays out of the recruiter path until a real PDF is
+  // hosted (links.ts keeps href "#" + a todo until Edward supplies one).
+  const resume = links.find((l) => l.kind === "resume" && l.href !== "#");
   // "May 2028" → "2028"; derived so a content edit updates the hero too.
   const classYear = profile.education.expectedGraduation.split(" ").pop();
 
@@ -126,8 +129,14 @@ export function Hero() {
           </div>
         ) : null}
 
+        {/* Recruiter path: featured work → resume → contact, in one row. */}
         <div data-hero-cta className="mt-10 flex flex-wrap items-center gap-4">
-          <GlowButton href="#systems">Explore the systems ↓</GlowButton>
+          <GlowButton href="#work">Featured work ↓</GlowButton>
+          {resume ? (
+            <GlowButton href={resume.href} variant="ghost" external>
+              Resume ↗
+            </GlowButton>
+          ) : null}
           {github ? (
             <GlowButton href={github.href} variant="ghost" external>
               GitHub ↗
@@ -135,7 +144,7 @@ export function Hero() {
           ) : null}
           {email ? (
             <GlowButton href={email.href} variant="ghost">
-              Email me
+              Contact
             </GlowButton>
           ) : null}
         </div>

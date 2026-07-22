@@ -221,7 +221,7 @@ test.describe("accessibility", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Edward Lei");
     await page.locator("#skills").scrollIntoViewIfNeeded();
-    await expect(page.getByText("The stack behind the systems.")).toBeVisible();
+    await expect(page.getByText("Tools grouped by the work they support.")).toBeVisible();
   });
 
   test("keyboard: skip link appears first and nav is focusable", async ({ page, isMobile }) => {

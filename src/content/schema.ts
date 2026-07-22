@@ -201,6 +201,29 @@ export const roadmapItemSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Section copy
+// ---------------------------------------------------------------------------
+
+/**
+ * Editorial copy for a homepage section. Lives in src/content/sections.ts so
+ * JARVIS edits headings/ledes as structured content, never component JSX.
+ */
+export const sectionCopySchema = z.object({
+  kicker: z.string().min(1),
+  title: z.string().min(1),
+  lede: z.string().min(1),
+});
+
+export const sectionsSchema = z.object({
+  systems: sectionCopySchema,
+  work: sectionCopySchema,
+  timeline: sectionCopySchema,
+  skills: sectionCopySchema,
+  roadmap: sectionCopySchema,
+  contact: sectionCopySchema,
+});
+
+// ---------------------------------------------------------------------------
 // Site config
 // ---------------------------------------------------------------------------
 
@@ -236,4 +259,6 @@ export type SkillGroup = z.infer<typeof skillGroupSchema>;
 export type Achievement = z.infer<typeof achievementSchema>;
 export type Coursework = z.infer<typeof courseworkSchema>;
 export type RoadmapItem = z.infer<typeof roadmapItemSchema>;
+export type SectionCopy = z.infer<typeof sectionCopySchema>;
+export type Sections = z.infer<typeof sectionsSchema>;
 export type SiteConfig = z.infer<typeof siteConfigSchema>;

@@ -13,10 +13,12 @@ import {
   profileSchema,
   projectSchema,
   roadmapItemSchema,
+  sectionsSchema,
   siteConfigSchema,
   skillGroupSchema,
   timelineEntrySchema,
 } from "./schema";
+import { sections } from "./sections";
 import { siteConfig } from "./site-config";
 import { skillGroups } from "./skills";
 import { timeline } from "./timeline";
@@ -69,6 +71,7 @@ export const content = {
     "src/content/coursework.ts",
   ),
   roadmap: parse(z.array(roadmapItemSchema), roadmap, "src/content/roadmap.ts"),
+  sections: parse(sectionsSchema, sections, "src/content/sections.ts"),
   siteConfig: parse(siteConfigSchema, siteConfig, "src/content/site-config.ts"),
 } as const;
 

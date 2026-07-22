@@ -30,6 +30,7 @@ export function buildSiteManifest() {
       { path: "src/content/achievements.ts", holds: "verified, source-cited achievements" },
       { path: "src/content/coursework.ts", holds: "selected coursework" },
       { path: "src/content/roadmap.ts", holds: "now/next/later directions" },
+      { path: "src/content/sections.ts", holds: "homepage section headings and ledes" },
       { path: "src/content/links.ts", holds: "public profile links" },
       { path: "src/content/site-config.ts", holds: "site meta, nav, versions" },
     ],

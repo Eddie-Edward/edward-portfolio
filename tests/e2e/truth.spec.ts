@@ -88,6 +88,24 @@ test.describe("truth alignment", () => {
     expect(manifest).toContain("/projects/lockin");
   });
 
+  test("section copy is served from the structured content layer", async ({
+    page,
+    request,
+  }) => {
+    const body = await (await request.get("/api/jarvis/portfolio-context")).json();
+    const sections = body.data.sections;
+    for (const key of ["systems", "work", "timeline", "skills", "roadmap", "contact"]) {
+      expect(sections[key]?.title, `sections.${key} must exist`).toBeTruthy();
+      expect(sections[key]?.lede, `sections.${key} must have a lede`).toBeTruthy();
+    }
+
+    // The rendered page uses the same source strings.
+    await page.goto("/");
+    await expect(page.getByText(sections.work.title)).toBeVisible();
+    await page.locator("#contact").scrollIntoViewIfNeeded();
+    await expect(page.getByText(sections.contact.title)).toBeVisible();
+  });
+
   test("preview clutter stays controlled", async ({ request }) => {
     const body = await (await request.get("/api/projects")).json();
     const previews = body.data.filter((p: { source: string }) => p.source === "todo");

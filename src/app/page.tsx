@@ -18,7 +18,7 @@ const HORIZONS = [
 ] as const;
 
 export default function HomePage() {
-  const { profile, skillGroups, achievements, coursework, roadmap, links } = content;
+  const { profile, skillGroups, achievements, coursework, roadmap, links, sections } = content;
   const email = links.find((l) => l.kind === "email");
   const github = links.find((l) => l.kind === "github");
   const linkedin = links.find((l) => l.kind === "linkedin");
@@ -68,23 +68,12 @@ export default function HomePage() {
           </div>
         </Section>
 
-        {/* ── Systems constellation ─────────────────────────────────────── */}
-        <Section id="systems" wide className="relative">
-          <div aria-hidden className="grid-backdrop absolute inset-0 -z-10 opacity-60" />
-          <SectionHeading
-            kicker="The constellation"
-            title="One builder. A system of systems."
-            lede="Every project orbits the same idea: AI that operates software, not just chats about it. JARVIS sits at the center — the rest are platforms, tools, and experiments it's learning to orchestrate."
-          />
-          <ProjectConstellation />
-        </Section>
-
-        {/* ── Selected work ─────────────────────────────────────────────── */}
+        {/* ── Selected work (featured systems first) ────────────────────── */}
         <Section id="work" wide>
           <SectionHeading
-            kicker="Selected work"
-            title="Shipped platforms, honest status."
-            lede="Full-stack AI systems with real backends — queues, sockets, migrations, tests. Filter by lens; entries marked as previews are still being written. Nothing here is inflated."
+            kicker={sections.work.kicker}
+            title={sections.work.title}
+            lede={sections.work.lede}
           />
           <WorkBrowser />
         </Section>
@@ -92,9 +81,9 @@ export default function HomePage() {
         {/* ── Timeline + proof of work ──────────────────────────────────── */}
         <Section id="timeline">
           <SectionHeading
-            kicker="Trajectory"
-            title="From robot vision to AI operating systems."
-            lede="Lead programmer on competition robots in high school. Three full-stack AI platforms shipped by freshman summer. The line keeps going."
+            kicker={sections.timeline.kicker}
+            title={sections.timeline.title}
+            lede={sections.timeline.lede}
           />
           <Timeline />
 
@@ -122,12 +111,23 @@ export default function HomePage() {
           </div>
         </Section>
 
+        {/* ── Systems constellation (secondary systems map) ─────────────── */}
+        <Section id="systems" wide className="relative">
+          <div aria-hidden className="grid-backdrop absolute inset-0 -z-10 opacity-60" />
+          <SectionHeading
+            kicker={sections.systems.kicker}
+            title={sections.systems.title}
+            lede={sections.systems.lede}
+          />
+          <ProjectConstellation />
+        </Section>
+
         {/* ── Skills / systems map ──────────────────────────────────────── */}
         <Section id="skills">
           <SectionHeading
-            kicker="Systems map"
-            title="The stack behind the systems."
-            lede="Grouped the way the work actually happens — from model APIs down to containers."
+            kicker={sections.skills.kicker}
+            title={sections.skills.title}
+            lede={sections.skills.lede}
           />
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {skillGroups.map((group, i) => (
@@ -154,9 +154,9 @@ export default function HomePage() {
         {/* ── Roadmap ───────────────────────────────────────────────────── */}
         <Section id="roadmap">
           <SectionHeading
-            kicker="Roadmap"
-            title="Where this is going."
-            lede="Directions, not claims — this list updates as work actually ships."
+            kicker={sections.roadmap.kicker}
+            title={sections.roadmap.title}
+            lede={sections.roadmap.lede}
           />
           <div className="grid gap-5 md:grid-cols-3">
             {HORIZONS.map((horizon, col) => (
@@ -189,18 +189,17 @@ export default function HomePage() {
             <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-nebula/20 via-transparent to-accent/15" />
             <div className="glass-strong relative rounded-3xl px-7 py-16 text-center md:px-16 md:py-20">
               <Reveal>
-                <p className="font-mono text-xs tracking-[0.3em] text-accent uppercase">Contact</p>
+                <p className="font-mono text-xs tracking-[0.3em] text-accent uppercase">
+                  {sections.contact.kicker}
+                </p>
               </Reveal>
               <Reveal index={1}>
                 <h2 className="mx-auto mt-4 max-w-2xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
-                  Let&apos;s build something that operates.
+                  {sections.contact.title}
                 </h2>
               </Reveal>
               <Reveal index={2}>
-                <p className="mx-auto mt-5 max-w-xl text-base text-mist">
-                  Internships, collaborations, or just comparing notes on agent systems — my inbox
-                  is open.
-                </p>
+                <p className="mx-auto mt-5 max-w-xl text-base text-mist">{sections.contact.lede}</p>
               </Reveal>
               <Reveal index={3}>
                 <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
