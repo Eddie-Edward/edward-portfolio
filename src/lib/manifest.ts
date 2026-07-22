@@ -13,6 +13,7 @@ export function buildSiteManifest() {
   const { siteConfig } = content;
   return {
     site: siteConfig.siteName,
+    siteUrl: siteConfig.siteUrl,
     tagline: siteConfig.tagline,
     contractVersion: siteConfig.jarvis.contractVersion,
     contentVersion: siteConfig.contentVersion,

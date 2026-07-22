@@ -231,6 +231,11 @@ export const siteConfigSchema = z.object({
   siteName: z.string().min(1),
   tagline: z.string().min(1),
   description: z.string().min(1),
+  /**
+   * Canonical origin for metadata/OG URLs. Currently the Vercel deployment;
+   * switch to the custom domain once Edward purchases one (PR 7).
+   */
+  siteUrl: z.string().url(),
   /** Bump when content meaningfully changes. JARVIS reads this. */
   contentVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   nav: z

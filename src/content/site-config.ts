@@ -9,7 +9,9 @@ export const siteConfig: SiteConfig = {
   tagline: "AI systems builder · engineering student",
   description:
     "Edward Lei builds AI systems end to end — agents, platforms, and developer tools. CS Engineering at the University of Michigan.",
-  contentVersion: "1.4.0",
+  // Live Vercel deployment; replace with the custom domain when purchased.
+  siteUrl: "https://edward-portfolio-five.vercel.app",
+  contentVersion: "1.5.0",
   // Root-relative so the nav works from case-study pages too, not just "/".
   // Order mirrors the page's reading order: featured work and evidence
   // first, the systems map second.

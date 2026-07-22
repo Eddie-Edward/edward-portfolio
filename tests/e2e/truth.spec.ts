@@ -88,6 +88,49 @@ test.describe("truth alignment", () => {
     expect(manifest).toContain("/projects/lockin");
   });
 
+  test("canonical and Open Graph metadata resolve against siteUrl", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      "https://edward-portfolio-five.vercel.app",
+    );
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      /Edward Lei/,
+    );
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      "content",
+      "summary_large_image",
+    );
+    const ogImage = await page
+      .locator('meta[property="og:image"]')
+      .first()
+      .getAttribute("content");
+    expect(ogImage).toBeTruthy();
+
+    // The dedicated OG image itself renders.
+    const res = await request.get("/opengraph-image");
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toContain("image/png");
+
+    // Case-study pages carry their own canonical.
+    await page.goto("/projects/lockin");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      "https://edward-portfolio-five.vercel.app/projects/lockin",
+    );
+  });
+
+  test("no dead resume link is rendered while the PDF is pending", async ({ page }) => {
+    await page.goto("/");
+    // The placeholder href "#" must never render as a visible Resume link
+    // in nav, hero, or footer; it appears only once a real PDF is hosted.
+    await expect(page.getByRole("link", { name: /Resume/ })).toHaveCount(0);
+  });
+
   test("section copy is served from the structured content layer", async ({
     page,
     request,
